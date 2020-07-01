@@ -12,8 +12,10 @@ import fr.w3blog.zpl.model.element.ZebraText;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import model.BodyPaymentInformation;
-import model.HeaderInformation;
+import demo_zpl.model.BodyPaymentInformation;
+import demo_zpl.model.HeaderInformation;
+
+import static demo_zpl.service.MockFactory.getHeaderInformation;
 
 /**
  *
@@ -29,11 +31,11 @@ public class ManualLabel {
 
     public String generateHeaderLabel() {
 
-        final HeaderInformation headerInformation = new HeaderInformation("El Store de EZ", "Dirección 1234", "123456", "AAAB 123", "1234566", "00001", "Customer Name", "Customer Address", "012012121212", "ADBVD 1234", "1", "50");
-
         //Width and Height
+        final HeaderInformation headerInformation = MockFactory.getHeaderInformation();
         final ZebraLabel zebraLabel = new ZebraLabel(609, 1015);
         zebraLabel.setDefaultZebraFont(DEFAULT_FONT);
+        zebraLabel.setDefaultFontSize(DEFAULT_FONT_SIZE);
         
         zebraLabel.addElement(new ZebraNativeZpl(
                 "^LS0^FS"
@@ -44,19 +46,19 @@ public class ManualLabel {
 
         //Information of store and the transaction
         // Position X - Y - TEXT - Font
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (0 * SPACE_LINE), headerInformation.getStoreName(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (1 * SPACE_LINE), headerInformation.getStoreAddress(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (2 * SPACE_LINE), headerInformation.getStorePhoneNumber(), DEFAULT_FONT_SIZE));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (0 * SPACE_LINE), headerInformation.getStoreName()));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (1 * SPACE_LINE), headerInformation.getStoreAddress()));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (2 * SPACE_LINE), headerInformation.getStorePhoneNumber()));
 
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (4 * SPACE_LINE), "No. Transacci\\A2n:", DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (5 * SPACE_LINE), "Id. Empleado:", DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (6 * SPACE_LINE), "Fecha:", DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (7 * SPACE_LINE), "Referencia #:", DEFAULT_FONT_SIZE));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (4 * SPACE_LINE), "No. Transacci\\A2n:"));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (5 * SPACE_LINE), "Id. Empleado:"));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (6 * SPACE_LINE), "Fecha:"));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, ROW_INIT + (7 * SPACE_LINE), "Referencia #:"));
 
-        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (4 * SPACE_LINE), headerInformation.getTrxNumber(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (5 * SPACE_LINE), headerInformation.getEmployeeId(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (6 * SPACE_LINE), LocalDateTime.now().toString(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (7 * SPACE_LINE), headerInformation.getRefNumber(), DEFAULT_FONT_SIZE));
+        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (4 * SPACE_LINE), headerInformation.getTrxNumber()));
+        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (5 * SPACE_LINE), headerInformation.getEmployeeId()));
+        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (6 * SPACE_LINE), LocalDateTime.now().toString()));
+        zebraLabel.addElement(new ZebraText(170, ROW_INIT + (7 * SPACE_LINE), headerInformation.getRefNumber()));
 
         //Conditions
         zebraLabel.addElement(new ZebraNativeZpl("^FT25,528^A0N,17,14^FB553,1,0^FH^FDLa exhibici\\A2n y comercializaci\\A2n de los art\\A1culos objeto de la presente operaci\\A2n, es realizada^FS"
@@ -68,27 +70,26 @@ public class ManualLabel {
                 + "^FT25,654^A0N,17,14^FB553,1,0^FH^FDproductos son definitivas y no est\\A0n sujetas a cambio o devoluci\\A2n.^FS"));
 
         //Information of customer
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (0 * SPACE_LINE), headerInformation.getCustomerName(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (1 * SPACE_LINE), headerInformation.getCustomerAddress(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (2 * SPACE_LINE), headerInformation.getCustomerPhoneNumber(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (3 * SPACE_LINE), headerInformation.getCustomerRfc(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (4 * SPACE_LINE), "Cantidad:", DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (5 * SPACE_LINE), "Precio:", DEFAULT_FONT_SIZE));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (0 * SPACE_LINE), headerInformation.getCustomerName()));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (1 * SPACE_LINE), headerInformation.getCustomerAddress()));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (2 * SPACE_LINE), headerInformation.getCustomerPhoneNumber()));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (3 * SPACE_LINE), headerInformation.getCustomerRfc()));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (4 * SPACE_LINE), "Cantidad:"));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (5 * SPACE_LINE), "Precio:"));
 
-        zebraLabel.addElement(new ZebraText(110, 817 + (4 * SPACE_LINE), headerInformation.getItemQty(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(110, 817 + (5 * SPACE_LINE), headerInformation.getItemPrice(), DEFAULT_FONT_SIZE));
-        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (7 * SPACE_LINE), "Fecha de pago:", DEFAULT_FONT_SIZE));
+        zebraLabel.addElement(new ZebraText(110, 817 + (4 * SPACE_LINE), headerInformation.getItemQty()));
+        zebraLabel.addElement(new ZebraText(110, 817 + (5 * SPACE_LINE), headerInformation.getItemPrice()));
+        zebraLabel.addElement(new ZebraText(COLUMN_INIT, 817 + (7 * SPACE_LINE), "Fecha de pago:"));
 
         //Add Body
-        List<BodyPaymentInformation> paymentsInformation = new ArrayList<>();
-        paymentsInformation.add(new BodyPaymentInformation("25/12/2020", "125.00"));
-        paymentsInformation.add(new BodyPaymentInformation("25/01/2021", "125.00"));
         int paymentLine = 1;
-        for (BodyPaymentInformation bodyBodyPayment : paymentsInformation) {
-            zebraLabel.addElement(new ZebraText(COLUMN_INIT, 985 + (paymentLine * SPACE_LINE), bodyBodyPayment.getPaymentDate(), DEFAULT_FONT_SIZE));
-            zebraLabel.addElement(new ZebraText(COLUMN_INIT, 985 + (++paymentLine * SPACE_LINE), bodyBodyPayment.getPaymentAmount(), DEFAULT_FONT_SIZE));
+        for (BodyPaymentInformation bodyBodyPayment : MockFactory.getBodyPaymentsInformation()) {
+            zebraLabel.addElement(new ZebraText(COLUMN_INIT, 985 + (paymentLine * SPACE_LINE), bodyBodyPayment.getPaymentDate()));
+            zebraLabel.addElement(new ZebraText(COLUMN_INIT, 985 + (++paymentLine * SPACE_LINE), bodyBodyPayment.getPaymentAmount()));
             paymentLine *= 2;
         }
+
+        //Add footer
 
         //Replace the end of the template to add more information.
         return zebraLabel.getZplCode();
