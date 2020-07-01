@@ -79,7 +79,7 @@ public class Main extends javax.swing.JFrame {
         // TODO add your handling code here:
         final BuildLabel ml = new BuildLabel();
         final String label = ml.generateCustomLabel();
-        printFile.sendToPrint(new ConnectionUtil(), label);
+        //printFile.sendToPrint(new ConnectionUtil(), label);
         txtNews.setText("");
         txtNews.setText(label);
     }//GEN-LAST:event_jButton1ActionPerformed
