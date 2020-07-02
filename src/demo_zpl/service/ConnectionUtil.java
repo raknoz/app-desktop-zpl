@@ -7,7 +7,9 @@ package demo_zpl.service;
 
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
+import com.zebra.sdk.comm.DriverPrinterConnection;
 import com.zebra.sdk.comm.TcpConnection;
+import com.zebra.sdk.comm.UsbConnection;
 
 /**
  *
@@ -21,5 +23,15 @@ public class ConnectionUtil {
         } catch (NumberFormatException e) {
             throw new ConnectionException(e.getMessage());
         }
+    }
+
+    public Connection getConnectionUSB() {
+        DriverPrinterConnection conn = null;
+        try {
+            conn = new DriverPrinterConnection("ZDesigner ZQ520 (ZPL)");
+        } catch (ConnectionException e) {
+            e.printStackTrace();
+        }
+        return conn;
     }
 }

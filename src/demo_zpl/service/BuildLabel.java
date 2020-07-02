@@ -29,7 +29,7 @@ public class BuildLabel {
     private static final int BODY_STARTER_LINE = 1009;
     private static final int FOOTER_ROW_LINE = 1035;
     private static final int WIDTH_PAGE = 609;
-    private static final int HEIGHT_PAGE = 1009;
+    private static final int HEIGHT_PAGE = 5000; //62,8 cm
 
     public String generateCustomLabel() {
 
@@ -41,7 +41,6 @@ public class BuildLabel {
         zebraLabel.setDefaultFontSize(DEFAULT_FONT_SIZE);
 
         //Title
-
         zebraLabel.addElement(new ZebraNativeZpl("^FT225,70^A0N,28,28^FB118,1,0^FH^FDApartados^FS"));
 
         //Information of store and the transaction

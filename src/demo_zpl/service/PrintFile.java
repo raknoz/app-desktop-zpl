@@ -8,20 +8,13 @@ package demo_zpl.service;
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
 import com.zebra.sdk.printer.PrinterLanguage;
-import com.zebra.sdk.printer.PrinterUtil;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
-import fr.w3blog.zpl.model.ZebraPrintException;
-import fr.w3blog.zpl.utils.ZebraUtils;
-import java.io.File;
-import java.io.FileOutputStream;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
  * @author davidgomez
  */
 public class PrintFile {
@@ -70,6 +63,20 @@ public class PrintFile {
             printerConnection.open();
             final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
             printer.sendCommand(zebraLabel);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void sendToPrintUSB(final ConnectionUtil connectionUtil, final String zebraLabel) {
+        Connection printerConnection = null;
+        try {
+
+            printerConnection = connectionUtil.getConnectionUSB();
+            printerConnection.open();
+            final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
+            printer.sendCommand(zebraLabel);
+            //printerConnection.sendAndWaitForResponse(zebraLabel.getBytes(), 5000, 500, null);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
