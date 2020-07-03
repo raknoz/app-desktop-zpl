@@ -56,7 +56,7 @@ public class PrintFile {
         }
     }
 
-    public void sendToPrint(final ConnectionUtil connectionUtil, final String zebraLabel) {
+    public void sendToPrintIP(final ConnectionUtil connectionUtil, final String zebraLabel) {
         Connection printerConnection = null;
         try {
             printerConnection = connectionUtil.getConnection("127.0.0.1", 9100);
@@ -76,7 +76,6 @@ public class PrintFile {
             printerConnection.open();
             final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
             printer.sendCommand(zebraLabel);
-            //printerConnection.sendAndWaitForResponse(zebraLabel.getBytes(), 5000, 500, null);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

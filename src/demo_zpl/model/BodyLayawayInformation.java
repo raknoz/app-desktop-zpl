@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * @author davidgomez
  */
-public class BodyInformation {
+public class BodyLayawayInformation {
 
     private final List<Payment> payments;
     private final List<PendingPayment> pendingPayments;
 
-    public BodyInformation(List<Payment> payments, List<PendingPayment> pendingPayments) {
+    public BodyLayawayInformation(List<Payment> payments, List<PendingPayment> pendingPayments) {
         this.payments = payments;
         this.pendingPayments = pendingPayments;
     }
