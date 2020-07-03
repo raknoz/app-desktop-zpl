@@ -192,7 +192,7 @@ public class LabelFactory {
         //Setup
         final HeaderInformation headerInformation = MockFactory.getHeaderInformation();
         final BodySaleInformation bodyInformation = MockFactory.getBodySaleInformation();
-        final ZebraLabel zebraLabel = new ZebraLabel(WIDTH_PAGE, HEIGHT_PAGE);
+        final ZebraLabel zebraLabel = new ZebraLabel();
         zebraLabel.setDefaultZebraFont(DEFAULT_FONT);
 
         //Logo
@@ -268,7 +268,6 @@ public class LabelFactory {
         }
 
         //Section of totals
-        currentPositionLine += SPACE_LINE;
         zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT_TOTAL, currentPositionLine, "Subtotal:", DEFAULT_FONT_SIZE));
         zebraLabel.addElement(new ZebraText(190, currentPositionLine, "XXXXXXXXXXX", DEFAULT_FONT_SIZE));
         currentPositionLine += SPACE_LINE;
@@ -280,6 +279,17 @@ public class LabelFactory {
 
         //Section of conditions II
         currentPositionLine += SPACE_LINE * 2;
+        zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Para cualquier aclaraci\\A2n, duda o sugerencia podrá realizarla en nuestro servicio de atenci\\A2n al ", FONT_SIZE_CONDITIONS));
+        currentPositionLine += SPACE_LINE;
+        zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "cliente 01 800 364 78 37 en horario de 9:00 am a 6:00 pm o en la Sucursal en donde efectu\\A2 su ", FONT_SIZE_CONDITIONS));
+        currentPositionLine += SPACE_LINE;
+        zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "compra. ", FONT_SIZE_CONDITIONS));
+        currentPositionLine += SPACE_LINE;
+        zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Nuestro horario es de Lunes a Viernes" + headerInformation.getStoreOpenHour() + " a " + headerInformation.getStoreCloseHour() +
+                ", Sabado " + headerInformation.getStoreOpenHourWeekend() + " a " + headerInformation.getStoreCloseHourWeekend(), FONT_SIZE_CONDITIONS));
+        currentPositionLine += SPACE_LINE;
+
+
         zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "En este acto autorizo a EZPAWN MANAGEMENT MEXICO S. DE R.L. DE C.V. y a ", FONT_SIZE_CONDITIONS));
         currentPositionLine += SPACE_LINE;
         zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "sus empresas filiales, afiliadas controladas o controladoras, al uso de mi ", FONT_SIZE_CONDITIONS));
@@ -298,6 +308,8 @@ public class LabelFactory {
         currentPositionLine += SPACE_LINE;
         zebraLabel.addElement(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Cualquier pago que se realice con tarjeta de cr\\82dito o d\\82bito NO causa comisi\\A2n.", FONT_SIZE_CONDITIONS));
 
+        zebraLabel.setWidthDots(WIDTH_PAGE);
+        zebraLabel.setHeightDots(currentPositionLine + SPACE_LINE * 4);
         return zebraLabel.getZplCode();
     }
 

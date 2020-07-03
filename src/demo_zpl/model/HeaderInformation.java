@@ -10,21 +10,29 @@ package demo_zpl.model;
  */
 public class HeaderInformation {
 
-    private String storeName;
-    private String storeAddress;
-    private String storePhoneNumber;
-    private String trxNumber;
-    private String employeeId;
-    private String refNumber;
-    private String customerName;
-    private String customerAddress;
-    private String customerPhoneNumber;
-    private String customerRfc;
+    private final String storeName;
+    private final String storeAddress;
+    private final String storePhoneNumber;
+    private final String storeOpenHour;
+    private final String storeCloseHour;
+    private final String storeOpenHourWeekend;
+    private final String storeCloseHourWeekend;
+    private final String trxNumber;
+    private final String employeeId;
+    private final String refNumber;
+    private final String customerName;
+    private final String customerAddress;
+    private final String customerPhoneNumber;
+    private final String customerRfc;
 
-    public HeaderInformation(String storeName, String storeAddress, String storePhoneNumber, String trxNumber, String employeeId, String refNumber, String customerName, String customerAddress, String customerPhoneNumber, String customerRfc) {
+    public HeaderInformation(String storeName, String storeAddress, String storePhoneNumber, final String storeOpenHour, final String storeCloseHour, final String storeOpenHourWeekend, final String storeCloseHourWeekend, String trxNumber, String employeeId, String refNumber, String customerName, String customerAddress, String customerPhoneNumber, String customerRfc) {
         this.storeName = storeName;
         this.storeAddress = storeAddress;
         this.storePhoneNumber = storePhoneNumber;
+        this.storeOpenHour = storeOpenHour;
+        this.storeCloseHour = storeCloseHour;
+        this.storeOpenHourWeekend = storeOpenHourWeekend;
+        this.storeCloseHourWeekend = storeCloseHourWeekend;
         this.trxNumber = trxNumber;
         this.employeeId = employeeId;
         this.refNumber = refNumber;
@@ -72,5 +80,21 @@ public class HeaderInformation {
 
     public String getCustomerRfc() {
         return customerRfc;
+    }
+
+    public String getStoreOpenHourWeekend() {
+        return storeOpenHourWeekend;
+    }
+
+    public String getStoreCloseHourWeekend() {
+        return storeCloseHourWeekend;
+    }
+
+    public String getStoreCloseHour() {
+        return storeCloseHour;
+    }
+
+    public String getStoreOpenHour() {
+        return storeOpenHour;
     }
 }

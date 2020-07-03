@@ -11,7 +11,9 @@ import java.util.List;
 public class MockFactory {
 
     public static HeaderInformation getHeaderInformation() {
-        return new HeaderInformation("El Store de EZ", "Dirección 1234", "123456", "AAAB 123", "1234566", "00001", "Customer Name", "Customer Address", "012012121212", "ADBVD 1234");
+        return new HeaderInformation("El Store de EZ", "Dirección 1234", "123456", "9:00 AM",
+                "6:00 PM", "9:00 AM", "6:00 PM", "AAAB 123", "1234566",
+                "00001", "Customer Name", "Customer Address", "012012121212", "ADBVD 1234");
     }
 
     public static BodyLayawayInformation getBodyInformation() {
