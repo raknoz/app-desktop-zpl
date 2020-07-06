@@ -97,13 +97,14 @@ public class Main extends javax.swing.JFrame {
         //printFile.sendToPrintIP(new ConnectionUtil(), LabelFactory.generateSaleLabel());
         //printFile.sendToPrintUSB(new ConnectionUtil(), label);
         txtNews.setText("");
-        txtNews.setText(LabelFactory.generateSaleLabel());
+        txtNews.setText(LabelFactory.generateLayawayLabel());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         txtNews.setText("");
-        txtNews.setText(LabelFactory.generateLayawayLabel());
+        txtNews.setText(LabelFactory.generateSaleLabel());
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
