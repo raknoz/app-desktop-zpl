@@ -22,7 +22,7 @@ public class LabelLayawayFactory {
     private static final int DEFAULT_MARGIN_LEFT = 25;
     private static final int DEFAULT_FONT_SIZE = 5;
     private static final int FONT_SIZE_CONDITIONS = 4;
-    private static final ZebraFont DEFAULT_FONT = ZebraFont.ZEBRA_ZERO;
+    private static final ZebraFont FONT_ZEBRA_D = ZebraFont.ZEBRA_D;
     private static final int SPACE_LINE = 24;
     private static final int WIDTH_PAGE = 609;
     private static final int HEIGHT_PAGE = 5000; //62,8 cm
@@ -37,28 +37,28 @@ public class LabelLayawayFactory {
         int currentPositionLine = 50;
 
         //Title
-        zebraElements.add(new ZebraText(225, currentPositionLine, "Apartados", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(225, currentPositionLine, "Apartados"));
 
         //Section of Information of the store
         currentPositionLine += SPACE_LINE * 2;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.storeName}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.storeName}"));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.storeAddress}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.storeAddress}"));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.storePhoneNumber}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.storePhoneNumber}"));
 
         currentPositionLine += SPACE_LINE * 2;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "No. Transacción:", DEFAULT_FONT_SIZE));
-        zebraElements.add(new ZebraText(230, currentPositionLine, "${receipt.nroTransaccion}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "No. Transacción:"));
+        zebraElements.add(new ZebraText(230, currentPositionLine, "${receipt.nroTransaccion}"));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Id. Empleado:", DEFAULT_FONT_SIZE));
-        zebraElements.add(new ZebraText(230, currentPositionLine, "${receipt.idEmployee}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Id. Empleado:"));
+        zebraElements.add(new ZebraText(230, currentPositionLine, "${receipt.idEmployee}"));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Fecha:", DEFAULT_FONT_SIZE));
-        zebraElements.add(new ZebraText(230, currentPositionLine, LocalDateTime.now().toString(), DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Fecha:"));
+        zebraElements.add(new ZebraText(230, currentPositionLine, LocalDateTime.now().toString()));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Referencia #:", DEFAULT_FONT_SIZE));
-        zebraElements.add(new ZebraText(230, currentPositionLine, "${receipt.invoiceNumber}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "Referencia #:"));
+        zebraElements.add(new ZebraText(230, currentPositionLine, "${receipt.invoiceNumber}"));
 
         //Section of Conditions
         currentPositionLine += SPACE_LINE * 2;
@@ -93,14 +93,14 @@ public class LabelLayawayFactory {
 
         //Section of Information of customer
         currentPositionLine += SPACE_LINE * 2;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerName}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerName}"));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerAddress}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerAddress}"));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerPhone}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerPhone}"));
         currentPositionLine += SPACE_LINE;
-        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerRFC}", DEFAULT_FONT_SIZE));
+        zebraElements.add(new ZebraText(DEFAULT_MARGIN_LEFT, currentPositionLine, "${receipt.customerRFC}"));
 
-        return ZplUtils.generateZplCode(WIDTH_PAGE, SPACE_LINE, DEFAULT_FONT, zebraElements, currentPositionLine);
+        return ZplCustomUtils.generateZplCode(WIDTH_PAGE, SPACE_LINE, zebraElements, currentPositionLine);
     }
 }

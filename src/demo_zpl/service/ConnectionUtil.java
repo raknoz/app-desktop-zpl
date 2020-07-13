@@ -17,7 +17,7 @@ import com.zebra.sdk.comm.UsbConnection;
  */
 public class ConnectionUtil {
 
-    public Connection getConnection(final String ipAddress, final int portNumber) throws ConnectionException {
+    static Connection getConnection(final String ipAddress, final int portNumber) throws ConnectionException {
         try {
             return new TcpConnection(ipAddress, portNumber);
         } catch (NumberFormatException e) {
@@ -25,7 +25,7 @@ public class ConnectionUtil {
         }
     }
 
-    public Connection getConnectionUSB() {
+    static Connection getConnectionUSB() {
         DriverPrinterConnection conn = null;
         try {
             conn = new DriverPrinterConnection("ZDesigner ZQ520 (ZPL)");

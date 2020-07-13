@@ -13,7 +13,7 @@ public class MockFactory {
     public static HeaderInformation getHeaderInformation() {
         return new HeaderInformation("El Store de EZ", "Dirección 1234", "123456", "9:00 AM",
                 "6:00 PM", "9:00 AM", "6:00 PM", "AAAB 123", "1234566",
-                "00001", "Customer Name", "Customer Address", "012012121212", "ADBVD 1234");
+                "00001", "Customer Name Test", "Customer Address Test", "012012121212", "ADBVD 1234");
     }
 
     public static BodyLayawayInformation getBodyInformation() {
@@ -23,15 +23,17 @@ public class MockFactory {
     }
 
     public static BodySaleInformation getBodySaleInformation() {
-        final BodySaleInformation.Item item0 = new BodySaleInformation.Item("1", "Item Zero", 1, 2.8);
-        final BodySaleInformation.Item item1 = new BodySaleInformation.Item("1", "Item One", 2, 3.5);
+        final BodySaleInformation.Item item0 = new BodySaleInformation.Item("1", "This is a long description of Item Zero, with the " +
+                "specification about the features! This is an example wit a lot of characters", 1,
+                2.8);
+        final BodySaleInformation.Item item1 = new BodySaleInformation.Item("2", "This is a description of item Two", 2, 3.5);
         final List<BodySaleInformation.Item> items = new ArrayList<>();
         items.add(item0);
         items.add(item1);
         return new BodySaleInformation(items);
     }
 
-    public static String getLogo() {
+    public static String getTest1() {
         return "^FO32,0^GFA,12288,12288,00064,:Z64:\n" +
                 "eJztWU1vG8cZntnligTliCJiVqmRmKwLFAIDqEbQAILqWiuUjC5tQwFcKIcodIv24oOjABakg5Ud00hjOIce8g" +
                 "PKpkBBLAtaR4Eq3HUTw0BPEirVyYHl2kgQgQZWDEBVqsvl9JklKYmURSnuIYfwlXa5Mzsvn3nm/ZgPEtKTnvSkJz" +

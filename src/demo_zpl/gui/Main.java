@@ -5,7 +5,10 @@
  */
 package demo_zpl.gui;
 
+import com.zebra.sdk.comm.ConnectionException;
+import demo_zpl.service.LabelLayawayFactory;
 import demo_zpl.service.LabelSaleFactory;
+import demo_zpl.service.ZplCustomUtils;
 
 /**
  * @author davidgomez
@@ -13,6 +16,7 @@ import demo_zpl.service.LabelSaleFactory;
 public class Main extends javax.swing.JFrame {
 
     private final LabelSaleFactory labelSaleFactory;
+    private final LabelLayawayFactory labelLayawayFactory;
 
     /**
      * Creates new form Main
@@ -24,6 +28,7 @@ public class Main extends javax.swing.JFrame {
         marginTopSpiner.setValue(50);
         spaceLineSpinner.setValue(24);
         labelSaleFactory = new LabelSaleFactory();
+        labelLayawayFactory = new LabelLayawayFactory();
     }
 
     /**
@@ -148,6 +153,13 @@ public class Main extends javax.swing.JFrame {
         //printFile.sendToPrintIP(new ConnectionUtil(), LabelFactory.generateSaleLabel());
         //printFile.sendToPrintUSB(new ConnectionUtil(), label);
         txtNews.setText("");
+        final String label = labelLayawayFactory.generateLayawayLabel();
+        try {
+            ZplCustomUtils.printLabel(label);
+        } catch (ConnectionException e) {
+            e.printStackTrace();
+        }
+        txtNews.setText(label);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -160,6 +172,7 @@ public class Main extends javax.swing.JFrame {
         labelSaleFactory.setSpaceLine((Integer) spaceLineSpinner.getValue());
 
         txtNews.setText("");
+        //txtNews.setText(labelSaleFactory.generateSaleLabelAllInOne());
         txtNews.setText(labelSaleFactory.generateSaleLabel());
     }//GEN-LAST:event_jButton2ActionPerformed
 
