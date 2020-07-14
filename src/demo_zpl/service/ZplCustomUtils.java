@@ -40,7 +40,7 @@ public class ZplCustomUtils {
     }
 
     public static void printLabel(final String zplLabel) throws ConnectionException {
-        Connection printerConnection = ConnectionUtil.getConnection("192.168.0.100", 9100);
+        Connection printerConnection = ConnectionUtil.getConnection("127.0.0.1", 9100);
         printerConnection.open();
         final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
         printer.sendCommand(zplLabel);
