@@ -36,11 +36,19 @@ public class ZplCustomUtils {
         zebraLabel.setDefaultZebraFont(ZebraFont.ZEBRA_ZERO);
         zebraElements.add(0, new ZebraNativeZpl("^CI28"));
         zebraLabel.setZebraElements(zebraElements);
-        return zebraLabel.getZplCode();//.replaceAll("\\^A0N,25,24", "\\^ADN,10,10");
+        return zebraLabel.getZplCode().replaceAll("\\^A0N,25,24", "\\^AFN,26,13");
     }
 
     public static void printLabel(final String zplLabel) throws ConnectionException {
         Connection printerConnection = ConnectionUtil.getConnection("127.0.0.1", 9100);
+        printerConnection.open();
+        final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
+        printer.sendCommand(zplLabel);
+        printerConnection.close();
+    }
+    
+    public static void printLabelUSB(final String zplLabel) throws ConnectionException {
+        Connection printerConnection = ConnectionUtil.getConnectionUSB();
         printerConnection.open();
         final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
         printer.sendCommand(zplLabel);
