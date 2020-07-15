@@ -34,7 +34,7 @@ public class ZplCustomUtils {
         final ZebraLabel zebraLabel = new ZebraLabel(widthPage, currentPositionLine + spaceLine);
         //Add character to set utf-8 encoding.
         zebraLabel.setDefaultZebraFont(ZebraFont.ZEBRA_ZERO);
-        zebraElements.add(0, new ZebraNativeZpl("^CI27"));
+        zebraElements.add(0, new ZebraNativeZpl("^CI28"));
         zebraLabel.setZebraElements(zebraElements);
         return zebraLabel.getZplCode();//.replaceAll("\\^A0N,25,24", "\\^AFN,10,5");
     }

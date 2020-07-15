@@ -43,8 +43,7 @@ public class LabelSaleFactory {
         resultZPLProcess = generateBodySaleTemplate(marginTop, bodyInformation);
         templates.add(ZplCustomUtils.generateZplCode(WIDTH_PAGE_DOTS, spaceLine, resultZPLProcess.getZebraElements(), resultZPLProcess.getLastPosition()));
         resultZPLProcess = generateFooterSaleTemplate(marginTop);
-        templates.add(ZplCustomUtils.generateZplCode(WIDTH_PAGE_DOTS, spaceLine, resultZPLProcess.getZebraElements(),
-                resultZPLProcess.getLastPosition()));
+        templates.add(ZplCustomUtils.generateZplCode(WIDTH_PAGE_DOTS, spaceLine, resultZPLProcess.getZebraElements(), resultZPLProcess.getLastPosition()));
 
         return String.join("\n", templates);
     }
@@ -70,39 +69,39 @@ public class LabelSaleFactory {
         int positionLine = currentPositionLine;
 
         //Title
-        zebraElements.add(new ZebraText(400, positionLine, "VENTA", fontSize));
+        zebraElements.add(new ZebraText(360, positionLine, "VENTA", fontSize));
 
         //Section of Information of the store
         positionLine += spaceLine * 2;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, headerInformation.getStoreName(), fontSize));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "${receipt.locationName}", fontSize));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, headerInformation.getStoreAddress(), fontSize));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "${receipt.locationAddress}", fontSize));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, headerInformation.getStorePhoneNumber(), fontSize));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "${receipt.locationPhoneNumber}", fontSize));
 
         //Section of Information of customer
         positionLine += spaceLine * 2;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, headerInformation.getCustomerName(), fontSize));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "${receipt.customerName}", fontSize));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, headerInformation.getCustomerAddress(), fontSize));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "${receipt.customerAddress}", fontSize));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, headerInformation.getCustomerPhoneNumber(), fontSize));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "${receipt.customerPhone}", fontSize));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, headerInformation.getCustomerRfc(), fontSize));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "${receipt.customerRfc}", fontSize));
 
         //Section of Information of transaction
         positionLine += spaceLine * 2;
         zebraElements.add(new ZebraText(marginLeft, positionLine, "No. Transacción:", fontSize));
-        zebraElements.add(new ZebraText(230, positionLine, headerInformation.getTrxNumber(), fontSize));
+        zebraElements.add(new ZebraText(230, positionLine, "${receipt.transactionNumber}", fontSize));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine, "Id. Empleado:", fontSize));
-        zebraElements.add(new ZebraText(230, positionLine, headerInformation.getEmployeeId(), fontSize));
+        zebraElements.add(new ZebraText(230, positionLine, "${receipt.employeeId}", fontSize));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine, "Fecha:", fontSize));
-        zebraElements.add(new ZebraText(230, positionLine, LocalDateTime.now().toString(), fontSize));
+        zebraElements.add(new ZebraText(230, positionLine, "${receipt.transactionDateTime}", fontSize));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine, "Referencia #:", fontSize));
-        zebraElements.add(new ZebraText(230, positionLine, headerInformation.getRefNumber(), fontSize));
+        zebraElements.add(new ZebraText(230, positionLine, "${receipt.invoiceNumber}", fontSize));
 
         //Section of Conditions
         positionLine += spaceLine * 2;
@@ -142,16 +141,16 @@ public class LabelSaleFactory {
 
         //Section dynamic of items
         for (final BodySaleInformation.Item item : bodyInformation.getItems()) {
-            zebraElements.add(new ZebraText(marginLeft, positionLine, item.getEzId(), fontSize));
-            zebraElements.add(new ZebraText(marginLeftItemsList, positionLine, String.valueOf(item.getQuantity()), fontSize));
-            zebraElements.add(new ZebraText(marginLeftItemsList + 200, positionLine, item.getUnitPrice().toString(), fontSize));
+            zebraElements.add(new ZebraText(marginLeft, positionLine, "${(item.ezId)!\"not present\"}", fontSize));
+            zebraElements.add(new ZebraText(marginLeftItemsList, positionLine, "${item.bulkQuantity}", fontSize));
+            zebraElements.add(new ZebraText(marginLeftItemsList + 200, positionLine, "${item.soldPrice}", fontSize));
             positionLine += spaceLine;
             final String formZebraBlock = "^FO%d,%d^A0N,%s,%s^FB350,12,,^FH\\^FD%s^FS";
             final Integer[] fontSizeDots = ZplCustomUtils.extractDotsFromFont(fontSize);
             final ZebraNativeZpl descriptionItem = new ZebraNativeZpl(String.format(formZebraBlock, marginLeft, positionLine,
                     fontSizeDots[0],
                     fontSizeDots[1],
-                    item.getFullDescription()));
+                    "${(item.description)!\"not present\"}"));
             //zebraElements.add(new ZebraText(marginLeft, positionLine, item.getFullDescription(), fontSize));
             zebraElements.add(descriptionItem);
             /* Hago el cálculo de cuantas líneas ocupa la descripción, estimando que ^FB350,12,,
@@ -173,24 +172,27 @@ public class LabelSaleFactory {
 
         //Section of totals
         zebraElements.add(new ZebraText(marginLeftTotal, positionLine, "Subtotal:", fontSize));
-        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "$00000000000", fontSize));
+        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "${receipt.subtotal}", fontSize));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeftTotal, positionLine, "IVA:", fontSize));
-        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "$00000000000", fontSize));
+        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "${receipt.IVA}", fontSize));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeftTotal, positionLine, "Total:", fontSize));
-        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "$00000000000", fontSize));
+        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "${receipt.total}", fontSize));
 
         //Section of conditions II
         positionLine += spaceLine * 2;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "Para cualquier aclaración, duda o sugerencia podrá realizarla en nuestro servicio de", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "Para cualquier aclaración, duda o sugerencia podrá realizarla en nuestro servicio de atención", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "atención al cliente 01 800 364 78 37 en horario de 9:00 am a 6:00 pm o en la Sucursal", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "al cliente 01 800 364 78 37 en horario de 9:00 am a 6:00 pm o en la Sucursal en donde efectuó", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "en donde efectuó su compra. ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "su compra.", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "Nuestro horario es de Lunes a Viernes " + "XX:XX AM" + " a " + "XX:XX PM"
-                + ", Sábado " + "XX:XX AM" + " a " + "XX:XX PM", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "Nuestro horario es de Lunes a Viernes ${receipt.locationOpenHour} AM a ${receipt.locationCloseHour} PM, Sábado ${receipt.locationOpenHourWeekend} AM a ${receipt.locationCloseHourWeekend} PM", fontSizeConditions));
         positionLine += spaceLine;
 
         zebraElements.add(new ZebraText(marginLeft, positionLine,
@@ -200,21 +202,19 @@ public class LabelSaleFactory {
                 "filiales, afiliadas controladas o controladoras, al uso de mi información proporcionada para", fontSizeConditions));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine,
-                "fines mercadotécnicos y publicitarios, Les instruyo para", fontSizeConditions));
+                "fines mercadotécnicos y publicitarios, Les instruyo para enviarme por el medio que ustedes", fontSizeConditions));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine,
-                "enviarme por el medio que ustedes estimen conveniente, información sobre sus aperturas,", fontSizeConditions));
+                "estimen conveniente, información sobre sus aperturas, promociones y publicidad de los", fontSizeConditions));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine,
-                " promociones y publicidad de los bienes y servicios que ustedes proporcionan,", fontSizeConditions));
+                "bienes y servicios que ustedes proporcionan, sujetando el uso de esta información a lo", fontSizeConditions));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine,
-                "sujetando el uso de esta información a lo establecido en la policita de privacidad.", fontSizeConditions));
-        //positionLine += spaceLine;
-        //zebraElements.add(new ZebraText(marginLeft, positionLine, " ", fontSizeConditions));
+                "establecido en la policita de privacidad.", fontSizeConditions));
         positionLine += spaceLine * 2;
         zebraElements.add(new ZebraText(marginLeft, positionLine, "http//www.empenofacil.com/avisodeprivacidad.html.", fontSizeConditions));
-        positionLine += spaceLine;
+        positionLine += spaceLine * 2;
         zebraElements.add(new ZebraText(marginLeft, positionLine,
                 "Cualquier pago que se realice con tarjeta de crédito o débito NO causa comisión.", fontSizeConditions));
 

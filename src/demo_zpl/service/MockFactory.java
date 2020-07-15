@@ -26,10 +26,10 @@ public class MockFactory {
         final BodySaleInformation.Item item0 = new BodySaleInformation.Item("1", "This is a long description of Item Zero, with the " +
                 "specification about the features! This is an example wit a lot of characters", 1,
                 2.8);
-        final BodySaleInformation.Item item1 = new BodySaleInformation.Item("2", "This is a description of item Two", 2, 3.5);
+        //final BodySaleInformation.Item item1 = new BodySaleInformation.Item("2", "This is a description of item Two", 2, 3.5);
         final List<BodySaleInformation.Item> items = new ArrayList<>();
         items.add(item0);
-        items.add(item1);
+        //items.add(item1);
         return new BodySaleInformation(items);
     }
 
