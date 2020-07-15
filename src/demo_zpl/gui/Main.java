@@ -184,8 +184,16 @@ public class Main extends javax.swing.JFrame {
         labelSaleFactory.setMarginTop((Integer) marginTopSpiner.getValue());
         labelSaleFactory.setSpaceLine((Integer) spaceLineSpinner.getValue());
 
+        final String label =labelSaleFactory.generateSaleLabel();
+       /* try {
+            ZplCustomUtils.printLabelUSB(label);
+        } catch (ConnectionException e) {
+           e.printStackTrace();
+        }
+
+        */
         txtNews.setText("");
-        txtNews.setText(labelSaleFactory.generateSaleLabel());
+        txtNews.setText(label);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -196,11 +204,13 @@ public class Main extends javax.swing.JFrame {
         labelSaleFactory.setSpaceLine((Integer) spaceLineSpinner.getValue());
 
         final String label = labelSaleFactory.generateSaleLabelAllInOne();
+       /*
         try {
             ZplCustomUtils.printLabelUSB(label);
         } catch (ConnectionException e) {
-            e.printStackTrace();
+           e.printStackTrace();
         }
+       */
         txtNews.setText("");
         txtNews.setText(label);
     }//GEN-LAST:event_jButton3ActionPerformed

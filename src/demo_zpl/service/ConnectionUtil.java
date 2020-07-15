@@ -28,7 +28,7 @@ public class ConnectionUtil {
     static Connection getConnectionUSB() {
         DriverPrinterConnection conn = null;
         try {
-            conn = new DriverPrinterConnection("ZTC-ZQ520-ZPL");
+            conn = new DriverPrinterConnection("ZDesigner ZQ520 (ZPL)");
         } catch (ConnectionException e) {
             e.printStackTrace();
         }

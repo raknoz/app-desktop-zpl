@@ -29,7 +29,6 @@ public class LabelSaleFactory {
     private int spaceLine;
 
     private static final int WIDTH_PAGE_DOTS = 804; // 10,1 cm APROX
-    private static final int HEIGHT_PAGE = 5000; //62,8 cm APROX
 
     public String generateSaleLabel() {
 
@@ -71,7 +70,7 @@ public class LabelSaleFactory {
         int positionLine = currentPositionLine;
 
         //Title
-        zebraElements.add(new ZebraText(225, positionLine, "Venta", fontSize));
+        zebraElements.add(new ZebraText(400, positionLine, "VENTA", fontSize));
 
         //Section of Information of the store
         positionLine += spaceLine * 2;
@@ -107,22 +106,29 @@ public class LabelSaleFactory {
 
         //Section of Conditions
         positionLine += spaceLine * 2;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "La exhibición y comercialización de los artículos objeto de la presente operación, es realizada", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "La exhibición y comercialización de los artículos objeto de la presente operación, es", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "por EZPAWN MANAGEMENT MEXICO S. DE R.L. DE C.V. al amparo del contrato de mutuo ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "realizada por EZPAWN MANAGEMENT MEXICO S. DE R.L. DE C.V. al amparo del contrato de ", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "con Interese y Garantía Prendaria y al artículo 9 fracción IV de la ley del impuesto al Valor", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "mutuo con Interese y Garantía Prendaria y al artículo 9 fracción IV de la ley del impuesto ", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "Agregado, por lo que al ser productos usados, no se otorga garantía alguna conforme lo", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "al Valor agregado, por lo que al ser productos usados, no se otorga garantía alguna ", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "dispuesto por la NOM-017-SCFI-1993/NOM-024-SCFI-1998, debiendo el Cliente ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "conforme lo dispuesto por la NOM-017-SCFI-1993/NOM-024-SCFI-1998, debiendo el ", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "verificar su condición y funcionamiento antes de salir del establecimiento, ya que ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "Cliente verificar su condición y funcionamiento antes de salir del establecimiento, ya que ", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "las ventas de los productos son definitivas y no están sujetas a cambio o devolución.", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "las ventas de los productos son definitivas y no están sujetas a cambio o devolución.", fontSizeConditions));
         positionLine += spaceLine * 2;
         zebraElements.add(new ZebraText(marginLeftItemsList, positionLine, "Cantidad", fontSize));
-        zebraElements.add(new ZebraText(marginLeftItemsList + 250, positionLine, "Precio", fontSize));
+        zebraElements.add(new ZebraText(marginLeftItemsList + 200, positionLine, "Precio", fontSize));
         positionLine += spaceLine * 2;
 
         return new ResultZPLProcess(zebraElements, positionLine);
@@ -138,9 +144,9 @@ public class LabelSaleFactory {
         for (final BodySaleInformation.Item item : bodyInformation.getItems()) {
             zebraElements.add(new ZebraText(marginLeft, positionLine, item.getEzId(), fontSize));
             zebraElements.add(new ZebraText(marginLeftItemsList, positionLine, String.valueOf(item.getQuantity()), fontSize));
-            zebraElements.add(new ZebraText(marginLeftItemsList + 250, positionLine, item.getUnitPrice().toString(), fontSize));
+            zebraElements.add(new ZebraText(marginLeftItemsList + 200, positionLine, item.getUnitPrice().toString(), fontSize));
             positionLine += spaceLine;
-            final String formZebraBlock = "^FO%d,%d^A0N,%s,%s^FB240,8,,^FH\\^FD%s^FS";
+            final String formZebraBlock = "^FO%d,%d^A0N,%s,%s^FB350,12,,^FH\\^FD%s^FS";
             final Integer[] fontSizeDots = ZplCustomUtils.extractDotsFromFont(fontSize);
             final ZebraNativeZpl descriptionItem = new ZebraNativeZpl(String.format(formZebraBlock, marginLeft, positionLine,
                     fontSizeDots[0],
@@ -148,10 +154,10 @@ public class LabelSaleFactory {
                     item.getFullDescription()));
             //zebraElements.add(new ZebraText(marginLeft, positionLine, item.getFullDescription(), fontSize));
             zebraElements.add(descriptionItem);
-            /* Hago el cálculo de cuantas líneas ocupa la descripción, estimando que ^FB240,8,,
+            /* Hago el cálculo de cuantas líneas ocupa la descripción, estimando que ^FB350,12,,
              * son 25 caracteres por línea SOLO SI LA FUENTE ES 5 SINO HAY QUE BAJAR EL DIVISOR.
              */
-            int lines = item.getFullDescription().length() / 15;
+            int lines = item.getFullDescription().length() / 25;
             /* ****** */
             positionLine += spaceLine * lines;
             positionLine += spaceLine;
@@ -167,43 +173,50 @@ public class LabelSaleFactory {
 
         //Section of totals
         zebraElements.add(new ZebraText(marginLeftTotal, positionLine, "Subtotal:", fontSize));
-        zebraElements.add(new ZebraText(marginLeftItemsList + 250, positionLine, "$00000000000", fontSize));
+        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "$00000000000", fontSize));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeftTotal, positionLine, "IVA:", fontSize));
-        zebraElements.add(new ZebraText(marginLeftItemsList + 250, positionLine, "$00000000000", fontSize));
+        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "$00000000000", fontSize));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeftTotal, positionLine, "Total:", fontSize));
-        zebraElements.add(new ZebraText(marginLeftItemsList + 250, positionLine, "$0000000000", fontSize));
+        zebraElements.add(new ZebraText(marginLeftItemsList + 190, positionLine, "$00000000000", fontSize));
 
         //Section of conditions II
         positionLine += spaceLine * 2;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "Para cualquier aclaración, duda o sugerencia podrá realizarla en nuestro servicio de atención al ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "Para cualquier aclaración, duda o sugerencia podrá realizarla en nuestro servicio de", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "cliente 01 800 364 78 37 en horario de 9:00 am a 6:00 pm o en la Sucursal en donde efectuó su ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "atención al cliente 01 800 364 78 37 en horario de 9:00 am a 6:00 pm o en la Sucursal", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "compra. ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "en donde efectuó su compra. ", fontSizeConditions));
         positionLine += spaceLine;
         zebraElements.add(new ZebraText(marginLeft, positionLine, "Nuestro horario es de Lunes a Viernes " + "XX:XX AM" + " a " + "XX:XX PM"
-                + ",Sabado " + "XX:XX AM" + " a " + "XX:XX PM", fontSizeConditions));
+                + ", Sábado " + "XX:XX AM" + " a " + "XX:XX PM", fontSizeConditions));
         positionLine += spaceLine;
 
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "En este acto autorizo a EZPAWN MANAGEMENT MEXICO S. DE R.L. DE C.V. y a ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "En este acto autorizo a EZPAWN MANAGEMENT MEXICO S. DE R.L. DE C.V. y a sus empresas", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "sus empresas filiales, afiliadas controladas o controladoras, al uso de mi ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "filiales, afiliadas controladas o controladoras, al uso de mi información proporcionada para", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "información proporcionada para fines mercadotécnicos y publicitarios, Les ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "fines mercadotécnicos y publicitarios, Les instruyo para", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "instruyo para enviarme por el medio que ustedes estimen conveniente, ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "enviarme por el medio que ustedes estimen conveniente, información sobre sus aperturas,", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "información sobre sus aperturas, promociones y publicidad de los bienes y ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                " promociones y publicidad de los bienes y servicios que ustedes proporcionan,", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "servicios que ustedes proporcionan, sujetando el uso de esta información a lo ", fontSizeConditions));
-        positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "establecido en la policita  de privacidad. ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "sujetando el uso de esta información a lo establecido en la policita de privacidad.", fontSizeConditions));
+        //positionLine += spaceLine;
+        //zebraElements.add(new ZebraText(marginLeft, positionLine, " ", fontSizeConditions));
         positionLine += spaceLine * 2;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "http//www.empenofacil.com/avisodeprivacidad.html. ", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine, "http//www.empenofacil.com/avisodeprivacidad.html.", fontSizeConditions));
         positionLine += spaceLine;
-        zebraElements.add(new ZebraText(marginLeft, positionLine, "Cualquier pago que se realice con tarjeta de crédito o débito NO causa comisión.", fontSizeConditions));
+        zebraElements.add(new ZebraText(marginLeft, positionLine,
+                "Cualquier pago que se realice con tarjeta de crédito o débito NO causa comisión.", fontSizeConditions));
 
         return new ResultZPLProcess(zebraElements, positionLine);
     }
