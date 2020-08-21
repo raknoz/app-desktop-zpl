@@ -240,10 +240,10 @@ public class ZPLImageConverter {
     }
      */
     public static String main(final String filePath) throws IOException {
-        //final BufferedImage originalImage = ImageIO.read(new File(filePath));
-        int scaledWidth = 1024;
-        int scaledHeight = 768;
-        final BufferedImage originalImage = ImageIO.read(ImageResizer.resize(filePath, scaledWidth, scaledHeight));
+        //int scaledWidth = 1024;
+        //int scaledHeight = 768;
+        //final BufferedImage originalImage = ImageIO.read(ImageResizer.resize(filePath, scaledWidth, scaledHeight));
+        BufferedImage originalImage = ImageIO.read(new File(filePath));
         final ZPLImageConverter zp = new ZPLImageConverter();
         return zp.convertFromImgToZpl(originalImage, 50);
     }
