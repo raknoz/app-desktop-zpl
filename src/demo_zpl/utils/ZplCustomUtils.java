@@ -3,18 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package demo_zpl.service;
+package demo_zpl.utils;
 
+import demo_zpl.utils.ConnectionUtil;
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
 import com.zebra.sdk.printer.PrinterLanguage;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import fr.w3blog.zpl.constant.ZebraFont;
-import fr.w3blog.zpl.model.PrinterOptions;
 import fr.w3blog.zpl.model.ZebraElement;
 import fr.w3blog.zpl.model.ZebraLabel;
-import fr.w3blog.zpl.model.element.ZebraAFontElement;
 import fr.w3blog.zpl.model.element.ZebraNativeZpl;
 import java.util.List;
 

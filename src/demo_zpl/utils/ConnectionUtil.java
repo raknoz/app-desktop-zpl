@@ -3,21 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package demo_zpl.service;
+package demo_zpl.utils;
 
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
 import com.zebra.sdk.comm.DriverPrinterConnection;
 import com.zebra.sdk.comm.TcpConnection;
-import com.zebra.sdk.comm.UsbConnection;
-
 /**
  *
  * @author davidgomez
  */
 public class ConnectionUtil {
 
-    static Connection getConnection(final String ipAddress, final int portNumber) throws ConnectionException {
+    public static Connection getConnection(final String ipAddress, final int portNumber) throws ConnectionException {
         try {
             return new TcpConnection(ipAddress, portNumber);
         } catch (NumberFormatException e) {
@@ -25,7 +23,7 @@ public class ConnectionUtil {
         }
     }
 
-    static Connection getConnectionUSB() {
+    public static Connection getConnectionUSB() {
         DriverPrinterConnection conn = null;
         try {
             conn = new DriverPrinterConnection("ZDesigner ZQ520 (ZPL)");

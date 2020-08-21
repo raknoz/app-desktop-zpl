@@ -1,21 +1,17 @@
 package demo_zpl.service;
 
-import com.zebra.sdk.device.ZebraIllegalArgumentException;
-import com.zebra.sdk.graphics.ZebraImageFactory;
-import com.zebra.sdk.graphics.ZebraImageI;
-import com.zebra.sdk.printer.PrinterUtil;
-
+import demo_zpl.utils.ImageResizer;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ZPLImageConverter {
+
     //private int blackLimit = 380;
     //private int total;
     //private int widthBytes;
@@ -67,19 +63,12 @@ public class ZPLImageConverter {
     public String convertFromImgToZpl(BufferedImage image, final int blacknessLimitPercentage) {
         final ImageZpl imageZpl = processImage(image, blacknessLimitPercentage);
 
-        return String.format("^XA ^FO0,0^GFA, %d, %d, %d, %s ^FS ^XZ",
+        return String.format("^XA ^POI ^LH0,0 ^PW804 ^LL200 ^FO0,0^GFA, %d, %d, %d, %s ^FS ^XZ",
                 imageZpl.getBinaryByteCount(),
                 imageZpl.getGraphicFieldCount(),
                 imageZpl.getBytesPerRow(),
                 imageZpl.getData()
         );
-    /*
-        return "^XA ^FO0,0^GFA," + imageZpl.getBinaryBiteCount() + ","
-                + imageZpl.getGraphicFieldCount()
-                + ","
-                + imageZpl.bytesPerRow + ", " +
-                imageZpl.getData() + "^FS ^XZ";
-        */
     }
 
     private ImageZpl processImage(final BufferedImage originalImage, final int blacknessLimitPercentage) {
@@ -191,6 +180,7 @@ public class ZPLImageConverter {
     }
 
     private static class ImageZpl {
+
         int binaryByteCount;
         int graphicFieldCount;
         int bytesPerRow;
@@ -202,10 +192,10 @@ public class ZPLImageConverter {
         /**
          * Format: ^GFa,b,c,d,data (a = ANSSI codec).
          *
-         * @param binaryByteCount   binary byte count.
+         * @param binaryByteCount binary byte count.
          * @param graphicFieldCount graphic field count.
-         * @param bytesPerRow       bytes per row.
-         * @param data              data.
+         * @param bytesPerRow bytes per row.
+         * @param data data.
          */
         public ImageZpl(final int binaryByteCount, final int graphicFieldCount, final int bytesPerRow, final String data) {
             this.binaryByteCount = binaryByteCount;
@@ -231,22 +221,30 @@ public class ZPLImageConverter {
         }
     }
 
-    private static void convertImageSDK() {
-        try {
-            ZebraImageI image = ZebraImageFactory.getImage("/home/davidgomez/Downloads/zebra_print/ticket/resource/BZ_Logo2.jpg");
-            OutputStream fileOutputStream = new FileOutputStream("BZ_Logo2.jpg");
-            PrinterUtil.convertGraphic("BZ_Logo2.jpg", image, fileOutputStream);
-
-        } catch (IOException | ZebraIllegalArgumentException e) {
-            e.printStackTrace();
-        }
+    private BufferedImage convertCMYK2RGB(BufferedImage image) throws IOException {
+        //Create a new RGB image
+        BufferedImage rgbImage = new BufferedImage(image.getWidth(), image.getHeight(),
+                BufferedImage.TYPE_3BYTE_BGR);
+        // then do a funky color convert
+        ColorConvertOp op = new ColorConvertOp(null);
+        op.filter(image, rgbImage);
+        return rgbImage;
     }
 
-
+    /*
     public static void main(String[] args) throws Exception {
         //BufferedImage originalImage = ImageIO.read(new File("/home/davidgomez/Downloads/zebra_print/ticket/resource/BZ_Logo2.jpg"));
         BufferedImage originalImage = ImageIO.read(new File("/home/davidgomez/Downloads/zebra_print/ticket/resource/logo_update.jpg"));
         ZPLImageConverter zp = new ZPLImageConverter();
         System.out.println(zp.convertFromImgToZpl(originalImage, 50));
+    }
+     */
+    public static String main(final String filePath) throws IOException {
+        //final BufferedImage originalImage = ImageIO.read(new File(filePath));
+        int scaledWidth = 1024;
+        int scaledHeight = 768;
+        final BufferedImage originalImage = ImageIO.read(ImageResizer.resize(filePath, scaledWidth, scaledHeight));
+        final ZPLImageConverter zp = new ZPLImageConverter();
+        return zp.convertFromImgToZpl(originalImage, 50);
     }
 }

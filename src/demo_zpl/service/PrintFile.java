@@ -10,22 +10,19 @@ import com.zebra.sdk.comm.ConnectionException;
 import com.zebra.sdk.printer.PrinterLanguage;
 import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
-
-import java.util.HashMap;
-import java.util.Map;
+import demo_zpl.utils.ConnectionUtil;
 
 /**
  * @author davidgomez
  */
 public class PrintFile {
 
-    public void sendFileToPrinter(final ConnectionUtil connectionUtil) {
+    public void sendFileToPrinter() {
         Connection printerConnection = null;
         try {
-            printerConnection = connectionUtil.getConnection("127.0.0.1", 9100);
+            printerConnection = ConnectionUtil.getConnection("127.0.0.1", 9100);
             printerConnection.open();
             final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-            //String filePath = createDemoFile(printer.getPrinterControlLanguage());
             String filePath = getFilePath();
             printer.sendFileContents(filePath);
         } catch (ConnectionException e) {
@@ -36,52 +33,52 @@ public class PrintFile {
                     printerConnection.close();
                 }
             } catch (ConnectionException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public void sendFileToPrinter2(final ConnectionUtil connectionUtil) {
+    public void sendLabelToPrintIP(final String zebraLabel) {
         Connection printerConnection = null;
         try {
-            printerConnection = connectionUtil.getConnection("127.0.0.1", 9100);
-            printerConnection.open();
-            ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-            Map<Integer, String> vars = new HashMap<>();
-            vars.put(2, "El Store");
-            vars.put(3, "La direciión");
-            vars.put(8, "AAD841185");
-            printer.printStoredFormat(getFilePath(), vars);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendToPrintIP(final ConnectionUtil connectionUtil, final String zebraLabel) {
-        Connection printerConnection = null;
-        try {
-            printerConnection = connectionUtil.getConnection("127.0.0.1", 9100);
+            printerConnection = ConnectionUtil.getConnection("127.0.0.1", 9100);
             printerConnection.open();
             final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
             printer.sendCommand(zebraLabel);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            try {
+                if (printerConnection != null) {
+                    printerConnection.close();
+                }
+            } catch (ConnectionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void sendToPrintUSB(final ConnectionUtil connectionUtil, final String zebraLabel) {
+    public void sendLabelToPrintUSB(final String zebraLabel) {
         Connection printerConnection = null;
         try {
-
-            printerConnection = connectionUtil.getConnectionUSB();
+            printerConnection = ConnectionUtil.getConnectionUSB();
             printerConnection.open();
             final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
             printer.sendCommand(zebraLabel);
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            try {
+                if (printerConnection != null) {
+                    printerConnection.close();
+                }
+            } catch (ConnectionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private String getFilePath() {
-        return "/home/davidgomez/Downloads/zebra_print/file_test/header.zpl";
+        return "classpath:";
     }
 }

@@ -5,18 +5,21 @@
  */
 package demo_zpl.gui;
 
-import com.zebra.sdk.comm.ConnectionException;
-import demo_zpl.service.LabelLayawayFactory;
-import demo_zpl.service.LabelSaleFactory;
-import demo_zpl.service.ZplCustomUtils;
+import demo_zpl.service.ZPLImageConverter;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * @author davidgomez
  */
 public class Main extends javax.swing.JFrame {
 
-    private final LabelSaleFactory labelSaleFactory;
-    private final LabelLayawayFactory labelLayawayFactory;
+    private String filePath;
 
     /**
      * Creates new form Main
@@ -27,8 +30,6 @@ public class Main extends javax.swing.JFrame {
         marginLeftSpinner.setValue(15);
         marginTopSpiner.setValue(50);
         spaceLineSpinner.setValue(24);
-        labelSaleFactory = new LabelSaleFactory();
-        labelLayawayFactory = new LabelLayawayFactory();
     }
 
     /**
@@ -42,8 +43,7 @@ public class Main extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         txtNews = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnProcessImage = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -52,25 +52,23 @@ public class Main extends javax.swing.JFrame {
         marginLeftSpinner = new javax.swing.JSpinner();
         fontSizeSpinner = new javax.swing.JSpinner();
         spaceLineSpinner = new javax.swing.JSpinner();
-        jButton3 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        txtFilePath = new javax.swing.JTextField();
+        btnSelectFile = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        txtNews.setEditable(false);
         txtNews.setColumns(20);
-        txtNews.setRows(5);
+        txtNews.setLineWrap(true);
+        txtNews.setRows(200);
         jScrollPane1.setViewportView(txtNews);
 
-        jButton1.setText("Accion Print Layaway");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnProcessImage.setText("Generate zpl logo");
+        btnProcessImage.setEnabled(false);
+        btnProcessImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        jButton2.setText("Print Sale parser");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnProcessImageActionPerformed(evt);
             }
         });
 
@@ -83,17 +81,32 @@ public class Main extends javax.swing.JFrame {
         jLabel4.setText("Space Line");
 
         marginTopSpiner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
+        marginTopSpiner.setEnabled(false);
 
         marginLeftSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
+        marginLeftSpinner.setEnabled(false);
 
         fontSizeSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
+        fontSizeSpinner.setEnabled(false);
 
         spaceLineSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
+        spaceLineSpinner.setEnabled(false);
 
-        jButton3.setText("Print Sale All-In-One");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jButton2.setText("Accion Print Receipt");
+        jButton2.setEnabled(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        txtFilePath.setEditable(false);
+        txtFilePath.setText("Select a image file ...");
+
+        btnSelectFile.setText("Select File");
+        btnSelectFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectFileActionPerformed(evt);
             }
         });
 
@@ -102,118 +115,100 @@ public class Main extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, 555, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnSelectFile, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
+                        .addComponent(btnProcessImage, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(marginTopSpiner, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(marginLeftSpinner, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(66, 66, 66)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4))
-                        .addGap(29, 29, 29)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(fontSizeSpinner)
-                            .addComponent(spaceLineSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 482, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel1))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(marginTopSpiner, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(marginLeftSpinner, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(66, 66, 66)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4))
+                                .addGap(29, 29, 29)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(fontSizeSpinner)
+                                    .addComponent(spaceLineSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(107, 107, 107)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(86, 86, 86)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(marginTopSpiner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(fontSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(spaceLineSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel4))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(marginLeftSpinner)
-                        .addComponent(jLabel2)))
-                .addGap(43, 43, 43)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(marginTopSpiner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3)
+                            .addComponent(fontSizeSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(spaceLineSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel4))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(marginLeftSpinner)
+                                .addComponent(jLabel2)))
+                        .addGap(92, 92, 92))
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 483, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnProcessImage, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnSelectFile))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        //printFile.sendToPrintIP(new ConnectionUtil(), LabelFactory.generateSaleLabel());
-        //printFile.sendToPrintUSB(new ConnectionUtil(), label);
+    private void btnProcessImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcessImageActionPerformed
         txtNews.setText("");
-        final String label = labelLayawayFactory.generateLayawayLabel();
         try {
-            ZplCustomUtils.printLabel(label);
-        } catch (ConnectionException e) {
-            e.printStackTrace();
+            txtNews.setText(ZPLImageConverter.main(this.filePath));
+        } catch (IOException ex) {
+            System.out.println("Error in process image: " + ex);
         }
-        txtNews.setText(label);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnProcessImageActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-
-        labelSaleFactory.setFontSize((Integer) fontSizeSpinner.getValue());
-        labelSaleFactory.setFontSizeConditions((Integer) fontSizeSpinner.getValue());
-        labelSaleFactory.setMarginLeft((Integer) marginLeftSpinner.getValue());
-        labelSaleFactory.setMarginTop((Integer) marginTopSpiner.getValue());
-        labelSaleFactory.setSpaceLine((Integer) spaceLineSpinner.getValue());
-
-        final String label =labelSaleFactory.generateSaleLabel();
-       /* try {
-            ZplCustomUtils.printLabelUSB(label);
-        } catch (ConnectionException e) {
-           e.printStackTrace();
-        }
-
-        */
-        txtNews.setText("");
-        txtNews.setText(label);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        labelSaleFactory.setFontSize((Integer) fontSizeSpinner.getValue());
-        labelSaleFactory.setFontSizeConditions((Integer) fontSizeSpinner.getValue());
-        labelSaleFactory.setMarginLeft((Integer) marginLeftSpinner.getValue());
-        labelSaleFactory.setMarginTop((Integer) marginTopSpiner.getValue());
-        labelSaleFactory.setSpaceLine((Integer) spaceLineSpinner.getValue());
-
-        final String label = labelSaleFactory.generateSaleLabelAllInOne();
-       /*
-        try {
-            ZplCustomUtils.printLabelUSB(label);
-        } catch (ConnectionException e) {
-           e.printStackTrace();
+    private void btnSelectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectFileActionPerformed
+        FileFilter filter = new FileNameExtensionFilter("JPEG File", "jpg", "jpeg");
+        JFileChooser jfc = new JFileChooser();
+        jfc.setAcceptAllFileFilterUsed(false);
+        jfc.setFileFilter(filter);
+        jfc.showOpenDialog(null);
+        File fileChoose = jfc.getSelectedFile();
+        if (fileChoose != null) {
+            txtFilePath.setText(fileChoose.getAbsolutePath());
+            btnProcessImage.setEnabled(true);
+            this.filePath = fileChoose.getAbsolutePath();
         }
-       */
-        txtNews.setText("");
-        txtNews.setText(label);
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_btnSelectFileActionPerformed
 
     /**
      * @param args the command line arguments
@@ -251,10 +246,10 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnProcessImage;
+    private javax.swing.JButton btnSelectFile;
     private javax.swing.JSpinner fontSizeSpinner;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -263,6 +258,7 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JSpinner marginLeftSpinner;
     private javax.swing.JSpinner marginTopSpiner;
     private javax.swing.JSpinner spaceLineSpinner;
+    private javax.swing.JTextField txtFilePath;
     private javax.swing.JTextArea txtNews;
     // End of variables declaration//GEN-END:variables
 }
