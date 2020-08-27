@@ -1,6 +1,5 @@
 package demo_zpl.service;
 
-import demo_zpl.utils.ImageResizer;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -63,7 +62,9 @@ public class ZPLImageConverter {
     public String convertFromImgToZpl(BufferedImage image, final int blacknessLimitPercentage) {
         final ImageZpl imageZpl = processImage(image, blacknessLimitPercentage);
 
-        return String.format("^XA ^POI ^LH0,0 ^PW804 ^LL200 ^FO0,0^GFA, %d, %d, %d, %s ^FS ^XZ",
+        return String.format("^XA \n^POI \n^LH0,0 \n^PW804 \n^LL%d "
+                + "\n^FO45,25^GFA, %d, %d, %d, %s ^FS \n^XZ",
+                image.getHeight() < 200? 200 : image.getHeight() + 10,
                 imageZpl.getBinaryByteCount(),
                 imageZpl.getGraphicFieldCount(),
                 imageZpl.getBytesPerRow(),
