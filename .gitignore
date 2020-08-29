@@ -1,0 +1,6 @@
+/src/demo_zpl/.idea/libraries/
+/src/demo_zpl/.idea/
+/dist/
+/build/
+*.class
+
