@@ -82,6 +82,7 @@ public class Main extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Zpl POC");
         setResizable(false);
 
         marginLeftSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
@@ -369,10 +370,11 @@ public class Main extends javax.swing.JFrame {
                                 .addComponent(chkKeepData))
                             .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtNameUsb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7)
-                            .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtNameUsb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel7))))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addComponent(btnSendPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -464,21 +466,22 @@ public class Main extends javax.swing.JFrame {
 
     private void btnSendPrinterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendPrinterActionPerformed
 
-        // Validation data
-        final boolean checkConnection = false;
+        boolean flagPrinter = false;
         // 1 - check connection
         this.changeStateLabel(this.lblStatus, Color.YELLOW, "Checking conecction ...", false);
-        if (checkConnection) {
-            if (this.rbOptWifi.isSelected()) {
-                printLabel.sendLabelToPrintIP(
-                        this.txtIpAddress.getText(),
-                        Integer.getInteger(this.txtPortNro.getText()),
-                        this.txtZplCodeGen.getText());
-            } else {
-                printLabel.sendLabelToPrintUSB(
-                        this.txtNameUsb.getText(),
-                        this.txtZplCodeGen.getText());
-            }
+
+        if (this.rbOptWifi.isSelected()) {
+            flagPrinter = printLabel.sendLabelToPrintIP(
+                    this.txtIpAddress.getText(),
+                    Integer.parseInt(this.txtPortNro.getText()),
+                    this.txtZplCodeGen.getText());
+        } else {
+            flagPrinter = printLabel.sendLabelToPrintUSB(
+                    this.txtNameUsb.getText(),
+                    this.txtZplCodeGen.getText());
+        }
+
+        if (flagPrinter) {
             this.changeStateLabel(this.lblStatus, Color.GREEN, "Done...", false);
         } else {
             this.changeStateLabel(this.lblStatus, Color.RED, "Conecction Failed...", false);
@@ -533,13 +536,17 @@ public class Main extends javax.swing.JFrame {
         resetLabelStatus();
         cleanUSBFields();
         cleanWIFIFields();
+        cleanTextArea();
 
         //Classes
         printLabel = new PrintLabel();
+        
+        //Libraries
+        loadLibraries();
     }
 
     private void cleanUSBFields() {
-        this.txtNameUsb.setText("");
+        this.txtNameUsb.setText("ZDesigner ZQ520 (CPCL)");
     }
 
     private void cleanWIFIFields() {
@@ -568,7 +575,7 @@ public class Main extends javax.swing.JFrame {
     private void resetLabelStatus() {
         this.changeStateLabel(this.lblStatus, new Color(242, 241, 240), "status", true);
     }
-    
+
     private void changeStateLabel(final JLabel label, final Color color, final String text, final boolean isReset) {
         label.setText(text);
         label.setBackground(color);
@@ -578,7 +585,11 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void cleanTextArea() {
-        this.txtZplCode.setText("");
+        this.txtZplCode.setText("^XA^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ");
+    }
+    
+    private void loadLibraries() {
+
     }
 
     // ############ End private methods ###############
