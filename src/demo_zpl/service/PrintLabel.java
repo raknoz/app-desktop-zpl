@@ -27,26 +27,6 @@ public class PrintLabel {
         }
     }
 
-    private void sendFileToPrinter(final String filePath) {
-        Connection printerConnection = null;
-        try {
-            printerConnection = ConnectionUtil.getConnectionIP("127.0.0.1", 9100);
-            printerConnection.open();
-            final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-            printer.sendFileContents(filePath);
-        } catch (ConnectionException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (printerConnection != null) {
-                    printerConnection.close();
-                }
-            } catch (ConnectionException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public Boolean sendLabelToPrintIP(final String ipAddress, final int port, final String zebraLabel) {
         Connection printerConnection = null;
         try {
