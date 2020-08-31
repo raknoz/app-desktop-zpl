@@ -2,5 +2,6 @@
 /src/demo_zpl/.idea/
 /dist/
 /build/
+/.idea/
 *.class
 
