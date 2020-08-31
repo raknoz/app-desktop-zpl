@@ -474,11 +474,11 @@ public class Main extends javax.swing.JFrame {
             flagPrinter = printLabel.sendLabelToPrintIP(
                     this.txtIpAddress.getText(),
                     Integer.parseInt(this.txtPortNro.getText()),
-                    this.txtZplCodeGen.getText());
+                    this.txtZplCode.getText());
         } else {
             flagPrinter = printLabel.sendLabelToPrintUSB(
                     this.txtNameUsb.getText(),
-                    this.txtZplCodeGen.getText());
+                    this.txtZplCode.getText());
         }
 
         if (flagPrinter) {
