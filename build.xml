@@ -70,4 +70,17 @@
     nbproject/build-impl.xml file. 
 
     -->
+	
+	<target name="-post-jar">
+		<jar jarfile="dist/demo_zpl_full.jar">
+			<zipfileset src="${dist.jar}" excludes="META-INF/*" />
+			<zipfileset src="lib/ZSDK_API.jar" excludes="META-INF/*" />
+			<zipfileset src="lib/zebra-zpl-0.0.3.jar" excludes="META-INF/*" />
+			<manifest>
+				<attribute name="Main-Class" value="demo_zpl.gui.Main" />
+			</manifest>
+		</jar>
+    </target>
+	
+	
 </project>

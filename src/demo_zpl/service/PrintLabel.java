@@ -87,6 +87,6 @@ public class PrintLabel {
      * 
      */
     private String getTestLabel() {
-        return "^XA^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ";
+        return "^XA^POI^LH0,0^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ";
     }
 }
