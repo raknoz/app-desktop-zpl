@@ -5,17 +5,19 @@
  */
 package demo_zpl.utils;
 
-import demo_zpl.utils.ConnectionUtil;
-import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
-import com.zebra.sdk.printer.PrinterLanguage;
-import com.zebra.sdk.printer.ZebraPrinter;
-import com.zebra.sdk.printer.ZebraPrinterFactory;
+import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
+import com.zebra.sdk.printer.discovery.UsbDiscoverer;
+import com.zebra.sdk.printer.discovery.ZebraPrinterFilter;
+import demo_zpl.enums.OptionConnect;
 import fr.w3blog.zpl.constant.ZebraFont;
 import fr.w3blog.zpl.model.ZebraElement;
 import fr.w3blog.zpl.model.ZebraLabel;
 import fr.w3blog.zpl.model.element.ZebraNativeZpl;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -29,32 +31,17 @@ public class ZplCustomUtils {
      * @return A String with the template in ZPL Code.
      */
     public static String generateZplCode(final int widthPage, final int spaceLine, final List<ZebraElement> zebraElements,
-                                   final int currentPositionLine) {
+            final int currentPositionLine) {
         final ZebraLabel zebraLabel = new ZebraLabel(widthPage, currentPositionLine + spaceLine);
         //Add character to set utf-8 encoding.
         zebraLabel.setDefaultZebraFont(ZebraFont.ZEBRA_ZERO);
         zebraElements.add(0, new ZebraNativeZpl("^CI28"));
         zebraLabel.setZebraElements(zebraElements);
-        return zebraLabel.getZplCode();//.replaceAll("\\^A0N,25,24", "\\^AFN,10,5");
-    }
-
-    public static void printLabel(final String zplLabel) throws ConnectionException {
-        Connection printerConnection = ConnectionUtil.getConnection("127.0.0.1", 9100);
-        printerConnection.open();
-        final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-        printer.sendCommand(zplLabel);
-        printerConnection.close();
-    }
-    
-    public static void printLabelUSB(final String zplLabel) throws ConnectionException {
-        Connection printerConnection = ConnectionUtil.getConnectionUSB();
-        printerConnection.open();
-        final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-        printer.sendCommand(zplLabel);
-        printerConnection.close();
+        return zebraLabel.getZplCode();
     }
 
     /**
+     * @param fontSize
      * @return array[height,width] in dots
      */
     public static Integer[] extractDotsFromFont(final int fontSize) {
@@ -63,5 +50,21 @@ public class ZplCustomUtils {
         array[0] = Math.round(fontSize * 4.16F);//Heigth
         array[1] = Math.round(fontSize * 4.06F);//With
         return array;
+    }
+
+    public static List<DiscoveredUsbPrinter> getListPrinterByFilter(final OptionConnect option) {
+        final List<DiscoveredUsbPrinter> printerList = new ArrayList<>();
+        try {
+            if (option.equals(OptionConnect.USB)) {
+                for (DiscoveredUsbPrinter printer : UsbDiscoverer.getZebraUsbPrinters(new ZebraPrinterFilter())) {
+                    printerList.add(printer);
+                }
+            } else {
+                //NetworkDiscoverer.localBroadcast(new DiscoveryHandlerImpl(discoverButton));
+            }
+        } catch (ConnectionException ex) {
+            return printerList;
+        }
+        return printerList;
     }
 }
