@@ -17,8 +17,8 @@ import demo_zpl.utils.ConnectionUtil;
  * @author davidgomez
  */
 public class PrintLabel {
-    
-    public void sendTestToPrint(final String usbName, final String ipAddress, final int port, final String option) {
+
+    private void sendTestToPrint(final String usbName, final String ipAddress, final int port, final String option) {
         if (option.equals(OptionConnect.USB)) {
             this.sendLabelToPrintUSB(usbName, getTestLabel());
         } else {
@@ -26,7 +26,7 @@ public class PrintLabel {
         }
     }
 
-    public void sendFileToPrinter(final String filePath) {
+    private void sendFileToPrinter(final String filePath) {
         Connection printerConnection = null;
         try {
             printerConnection = ConnectionUtil.getConnectionIP("127.0.0.1", 9100);
@@ -46,15 +46,16 @@ public class PrintLabel {
         }
     }
 
-    public void sendLabelToPrintIP(final String ipAddress, final int port, final String zebraLabel) {
+    public Boolean sendLabelToPrintIP(final String ipAddress, final int port, final String zebraLabel) {
         Connection printerConnection = null;
         try {
             printerConnection = ConnectionUtil.getConnectionIP(ipAddress, port);
             printerConnection.open();
             final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
             printer.sendCommand(zebraLabel);
-        } catch (Exception ex) {
+        } catch (ConnectionException ex) {
             ex.printStackTrace();
+            return false;
         } finally {
             try {
                 if (printerConnection != null) {
@@ -62,11 +63,13 @@ public class PrintLabel {
                 }
             } catch (ConnectionException e) {
                 e.printStackTrace();
+                return false;
             }
         }
+        return true;
     }
 
-    public void sendLabelToPrintUSB(final String usbName, final String zebraLabel) {
+    public Boolean sendLabelToPrintUSB(final String usbName, final String zebraLabel) {
         Connection printerConnection = null;
         try {
             printerConnection = ConnectionUtil.getConnectionUSB(usbName);
@@ -75,6 +78,7 @@ public class PrintLabel {
             printer.sendCommand(zebraLabel);
         } catch (Exception ex) {
             ex.printStackTrace();
+            return false;
         } finally {
             try {
                 if (printerConnection != null) {
@@ -82,11 +86,12 @@ public class PrintLabel {
                 }
             } catch (ConnectionException e) {
                 e.printStackTrace();
+                return false;
             }
         }
+        return true;
     }
-    
-   
+
     /*
      * Returns the command for a test label depending on the printer control language
      * The test label is a box with the word "TEST" inside of it
@@ -101,7 +106,7 @@ public class PrintLabel {
      * 
      * 
      */
-     private String getTestLabel() {
+    private String getTestLabel() {
         return "^XA^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ";
     }
 }
