@@ -12,6 +12,7 @@ import com.zebra.sdk.printer.ZebraPrinter;
 import com.zebra.sdk.printer.ZebraPrinterFactory;
 import demo_zpl.enums.OptionConnect;
 import demo_zpl.utils.ConnectionUtil;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author davidgomez
@@ -74,8 +75,7 @@ public class PrintLabel {
         try {
             printerConnection = ConnectionUtil.getConnectionUSB(usbName);
             printerConnection.open();
-            final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-            printer.sendCommand(zebraLabel);
+            printerConnection.write(zebraLabel.getBytes(StandardCharsets.UTF_8));
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
