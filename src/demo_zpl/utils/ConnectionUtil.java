@@ -26,13 +26,11 @@ public class ConnectionUtil {
     }
 
     public static Connection getConnectionUSB(final String usbName) throws ConnectionException {
-        DriverPrinterConnection conn = null;
         try {
-            conn = new DriverPrinterConnection(usbName);
+            return new DriverPrinterConnection(usbName);
         } catch (ConnectionException e) {
             e.printStackTrace();
             throw new ConnectionException(e.getMessage());
         }
-        return conn;
     }
 }
