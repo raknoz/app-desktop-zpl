@@ -32,8 +32,7 @@ public class PrintLabel {
         try {
             printerConnection = ConnectionUtil.getConnectionIP(ipAddress, port);
             printerConnection.open();
-            final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-            printer.sendCommand(zebraLabel);
+            printerConnection.write(zebraLabel.getBytes(StandardCharsets.UTF_8));
         } catch (ConnectionException ex) {
             ex.printStackTrace();
             return false;
@@ -56,7 +55,7 @@ public class PrintLabel {
             printerConnection = ConnectionUtil.getConnectionUSB(usbName);
             printerConnection.open();
             printerConnection.write(zebraLabel.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception ex) {
+        } catch (ConnectionException ex) {
             ex.printStackTrace();
             return false;
         } finally {

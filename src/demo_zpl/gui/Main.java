@@ -5,14 +5,20 @@
  */
 package demo_zpl.gui;
 
+import demo_zpl.enums.OptionConnect;
 import demo_zpl.service.PrintLabel;
 import demo_zpl.service.ZPLImageConverter;
+import demo_zpl.utils.ZplCustomUtils;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
@@ -72,7 +78,6 @@ public class Main extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         txtPortNro = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        txtNameUsb = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtZplCode = new javax.swing.JTextArea();
         rbOptWifi = new javax.swing.JRadioButton();
@@ -80,6 +85,7 @@ public class Main extends javax.swing.JFrame {
         lblStatus = new javax.swing.JLabel();
         chkKeepData = new javax.swing.JCheckBox();
         jButton1 = new javax.swing.JButton();
+        cbPrinters = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Zpl POC");
@@ -127,7 +133,7 @@ public class Main extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 925, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 992, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
@@ -213,7 +219,7 @@ public class Main extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 925, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 992, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(btnClear)
                                 .addGap(0, 0, Short.MAX_VALUE)))
@@ -268,7 +274,7 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setText("USB name:");
+        jLabel7.setText("USB Printers:");
 
         txtZplCode.setColumns(20);
         txtZplCode.setLineWrap(true);
@@ -316,34 +322,27 @@ public class Main extends javax.swing.JFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel5))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(48, 48, 48)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jLabel7)
-                                        .addGap(12, 12, 12))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jLabel5)
-                                        .addGap(18, 18, 18)))
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel6)
                                         .addGap(18, 18, 18)
-                                        .addComponent(jLabel6))
-                                    .addComponent(txtNameUsb, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
                                         .addComponent(txtPortNro, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(29, 29, 29)
-                                        .addComponent(chkKeepData)
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addGap(53, 53, 53)
+                                        .addComponent(chkKeepData))
+                                    .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(rbOptWifi)
                                 .addGap(18, 18, 18)
                                 .addComponent(rbOptUsb)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 168, Short.MAX_VALUE)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                                 .addComponent(jButton1)
@@ -361,27 +360,25 @@ public class Main extends javax.swing.JFrame {
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(rbOptWifi)
                             .addComponent(rbOptUsb))
+                        .addGap(19, 19, 19)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel6)
+                            .addComponent(txtPortNro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkKeepData))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel6)
-                                .addComponent(txtPortNro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(chkKeepData))
-                            .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtNameUsb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel7))))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(cbPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblStatus)))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addComponent(btnSendPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(21, 21, 21)
                         .addComponent(jButton1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -466,9 +463,10 @@ public class Main extends javax.swing.JFrame {
 
     private void btnSendPrinterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendPrinterActionPerformed
 
+        resetLabelStatus();
         boolean flagPrinter = false;
         // 1 - check connection
-        this.changeStateLabel(this.lblStatus, Color.YELLOW, "Checking conecction ...", false);
+        updateStatusBarOnGui("Checking conecction ...", Color.YELLOW, false);
 
         if (this.rbOptWifi.isSelected()) {
             flagPrinter = printLabel.sendLabelToPrintIP(
@@ -477,14 +475,13 @@ public class Main extends javax.swing.JFrame {
                     this.txtZplCode.getText());
         } else {
             flagPrinter = printLabel.sendLabelToPrintUSB(
-                    this.txtNameUsb.getText(),
+                    String.valueOf(this.cbPrinters.getSelectedItem()),
                     this.txtZplCode.getText());
         }
-
         if (flagPrinter) {
-            this.changeStateLabel(this.lblStatus, Color.GREEN, "Done...", false);
+            updateStatusBarOnGui("Done...", Color.GREEN, false);
         } else {
-            this.changeStateLabel(this.lblStatus, Color.RED, "Conecction Failed...", false);
+            updateStatusBarOnGui("Conecction Failed...", Color.RED, false);
         }
     }//GEN-LAST:event_btnSendPrinterActionPerformed
 
@@ -540,13 +537,18 @@ public class Main extends javax.swing.JFrame {
 
         //Classes
         printLabel = new PrintLabel();
-        
-        //Libraries
-        loadLibraries();
+
+        //Printers
+        loadDriversPrintersUSB();
+        if (this.cbPrinters.getItemCount() == 0) {
+            this.cbPrinters.setSelectedIndex(-1);
+        } else {
+            this.cbPrinters.setSelectedIndex(0);
+        }
     }
 
     private void cleanUSBFields() {
-        this.txtNameUsb.setText("ZDesigner ZQ520 (CPCL)");
+        this.cbPrinters.setSelectedIndex(-1);
     }
 
     private void cleanWIFIFields() {
@@ -558,7 +560,7 @@ public class Main extends javax.swing.JFrame {
         if (!this.chkKeepData.isSelected()) {
             this.cleanUSBFields();
         }
-        this.txtNameUsb.setEnabled(false);
+        this.cbPrinters.setEnabled(false);
         this.txtIpAddress.setEnabled(true);
         this.txtPortNro.setEnabled(true);
     }
@@ -567,29 +569,33 @@ public class Main extends javax.swing.JFrame {
         if (!this.chkKeepData.isSelected()) {
             this.cleanWIFIFields();
         }
-        this.txtNameUsb.setEnabled(true);
+        this.cbPrinters.setEnabled(true);
         this.txtIpAddress.setEnabled(false);
         this.txtPortNro.setEnabled(false);
     }
 
     private void resetLabelStatus() {
-        this.changeStateLabel(this.lblStatus, new Color(242, 241, 240), "status", true);
+        updateStatusBarOnGui("status", new Color(242, 241, 240), true);
     }
 
-    private void changeStateLabel(final JLabel label, final Color color, final String text, final boolean isReset) {
-        label.setText(text);
-        label.setBackground(color);
-        label.setOpaque(!isReset);
-        final Font font = new Font("Courier", Font.BOLD, 15);
-        label.setFont(font);
+    private void updateStatusBarOnGui(final String statusMessage, final Color color, final boolean isReset) {
+        SwingUtilities.invokeLater(() -> {
+            lblStatus.setText(statusMessage);
+            lblStatus.setBackground(color);
+            lblStatus.setOpaque(!isReset);
+            Font font1 = new Font("Courier", Font.BOLD, 15);
+            lblStatus.setFont(font1);
+        });
     }
 
     private void cleanTextArea() {
         this.txtZplCode.setText("^XA^POI^LH0,0^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ");
     }
-    
-    private void loadLibraries() {
 
+    private void loadDriversPrintersUSB() {
+        ZplCustomUtils.getListPrinterByFilter(OptionConnect.USB).forEach(dp -> {
+            this.cbPrinters.addItem(dp.printerName);
+        });
     }
 
     // ############ End private methods ###############
@@ -634,6 +640,7 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JButton btnProcessImage;
     private javax.swing.JButton btnSelectFile;
     private javax.swing.JButton btnSendPrinter;
+    private javax.swing.JComboBox<String> cbPrinters;
     private javax.swing.JCheckBox chkKeepData;
     private javax.swing.JSpinner fontSizeSpinner;
     private javax.swing.JButton jButton1;
@@ -660,7 +667,6 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JSpinner spaceLineSpinner;
     private javax.swing.JTextField txtFilePath;
     private javax.swing.JTextField txtIpAddress;
-    private javax.swing.JTextField txtNameUsb;
     private javax.swing.JTextField txtPortNro;
     private javax.swing.JTextArea txtZplCode;
     private javax.swing.JTextArea txtZplCodeGen;
