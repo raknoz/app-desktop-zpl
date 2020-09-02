@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ZPLImageConverter {
+public class ImageConverterService {
 
     //private int blackLimit = 380;
     //private int total;
@@ -59,7 +59,7 @@ public class ZPLImageConverter {
         MAP_CODE.put(400, "z");
     }
 
-    public String convertFromImgToZpl(BufferedImage image, final int blacknessLimitPercentage) {
+    private String convertImgageToZpl(BufferedImage image, final int blacknessLimitPercentage) {
         final ImageZpl imageZpl = processImage(image, blacknessLimitPercentage);
 
         return String.format("^XA \n^POI \n^LH0,0 \n^PW804 \n^LL%d "
@@ -232,20 +232,12 @@ public class ZPLImageConverter {
         return rgbImage;
     }
 
-    /*
-    public static void main(String[] args) throws Exception {
-        //BufferedImage originalImage = ImageIO.read(new File("/home/davidgomez/Downloads/zebra_print/ticket/resource/BZ_Logo2.jpg"));
-        BufferedImage originalImage = ImageIO.read(new File("/home/davidgomez/Downloads/zebra_print/ticket/resource/logo_update.jpg"));
-        ZPLImageConverter zp = new ZPLImageConverter();
-        System.out.println(zp.convertFromImgToZpl(originalImage, 50));
-    }
-     */
     public static String main(final String filePath) throws IOException {
         //int scaledWidth = 1024;
         //int scaledHeight = 768;
         //final BufferedImage originalImage = ImageIO.read(ImageResizer.resize(filePath, scaledWidth, scaledHeight));
         BufferedImage originalImage = ImageIO.read(new File(filePath));
-        final ZPLImageConverter zp = new ZPLImageConverter();
-        return zp.convertFromImgToZpl(originalImage, 50);
+        final ImageConverterService zp = new ImageConverterService();
+        return zp.convertImgageToZpl(originalImage, 50);
     }
 }

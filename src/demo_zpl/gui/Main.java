@@ -5,19 +5,27 @@
  */
 package demo_zpl.gui;
 
+import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
+import demo_zpl.dto.DiscoveredPrinterDto;
 import demo_zpl.enums.OptionConnect;
-import demo_zpl.service.PrintLabel;
-import demo_zpl.service.ZPLImageConverter;
+import demo_zpl.listeners.ItemChangeListener;
+import demo_zpl.service.FindPrinterService;
+import demo_zpl.service.PrintLabelService;
+import demo_zpl.service.ImageConverterService;
 import demo_zpl.utils.ZplCustomUtils;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -31,7 +39,8 @@ import javax.swing.text.PlainDocument;
 public class Main extends javax.swing.JFrame {
 
     private String filePath;
-    private PrintLabel printLabel;
+    private PrintLabelService printLabel;
+    private Map<String, String> mapDiscoveredPrinters;
 
     /**
      * Creates new form Main
@@ -86,6 +95,16 @@ public class Main extends javax.swing.JFrame {
         chkKeepData = new javax.swing.JCheckBox();
         jButton1 = new javax.swing.JButton();
         cbPrinters = new javax.swing.JComboBox<>();
+        jPanel4 = new javax.swing.JPanel();
+        jButton2 = new javax.swing.JButton();
+        txtIpRange = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtPrinterProperties = new javax.swing.JTextArea();
+        jLabel9 = new javax.swing.JLabel();
+        cbDiscoveredPrinters = new javax.swing.JComboBox<>();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Zpl POC");
@@ -243,7 +262,7 @@ public class Main extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnClear)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 472, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -378,11 +397,88 @@ public class Main extends javax.swing.JFrame {
                         .addGap(21, 21, 21)
                         .addComponent(jButton1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("Send to Print", jPanel3);
+
+        jButton2.setText("Find Printers");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        txtIpRange.setToolTipText("Format: ###.###.###.###-###");
+        txtIpRange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtIpRangeActionPerformed(evt);
+            }
+        });
+
+        jLabel8.setText("IP Range:");
+
+        txtPrinterProperties.setEditable(false);
+        txtPrinterProperties.setColumns(20);
+        txtPrinterProperties.setRows(5);
+        jScrollPane5.setViewportView(txtPrinterProperties);
+
+        jLabel9.setText("Priters founded:");
+
+        jLabel10.setText("Properties");
+
+        jLabel11.setText("Format: ###.###.###.###-###");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(51, 51, 51)
+                .addComponent(jLabel8)
+                .addGap(28, 28, 28)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addComponent(txtIpRange, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(60, 60, 60)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10))
+                        .addContainerGap(39, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(191, 191, 191))))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtIpRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8)))
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 560, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Find Printers", jPanel4);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -421,7 +517,7 @@ public class Main extends javax.swing.JFrame {
     private void btnProcessImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcessImageActionPerformed
         txtZplCodeGen.setText("");
         try {
-            txtZplCodeGen.setText(ZPLImageConverter.main(this.filePath));
+            txtZplCodeGen.setText(ImageConverterService.main(this.filePath));
         } catch (IOException ex) {
             System.out.println("Error in process image: " + ex);
         }
@@ -486,8 +582,30 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSendPrinterActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.cleanTextArea();
+        this.txtZplCode.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        try {
+            final FindPrinterService fps = new FindPrinterService();
+            final List<DiscoveredPrinterDto> printers = fps.findPrinter(this.txtIpRange.getText());
+
+            if (printers != null && !printers.isEmpty()) {
+                for (final DiscoveredPrinterDto printer : printers) {
+                    this.cbDiscoveredPrinters.addItem(printer.getIpAddress());
+                    mapDiscoveredPrinters.put(printer.getIpAddress(), printer.getStrProperties());
+                }
+            } else {
+                infoBox("No results!", "Find printers");
+            }
+        } catch (Exception e) {
+            infoBox(e.getMessage(), "Find printers");
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void txtIpRangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIpRangeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIpRangeActionPerformed
 
     // ############ Private methods ###############
     //Class implemented to define the lenght of some textbox field
@@ -529,6 +647,11 @@ public class Main extends javax.swing.JFrame {
         this.rbGroup.add(rbOptWifi);
         this.rbOptWifi.doClick();
 
+        // 
+        this.cbDiscoveredPrinters.addItemListener(new ItemChangeListener());
+        this.cbDiscoveredPrinters.setEditable(false);
+        this.cbDiscoveredPrinters.setEnabled(false);
+
         //reset
         resetLabelStatus();
         cleanUSBFields();
@@ -536,7 +659,7 @@ public class Main extends javax.swing.JFrame {
         cleanTextArea();
 
         //Classes
-        printLabel = new PrintLabel();
+        printLabel = new PrintLabelService();
 
         //Printers
         loadDriversPrintersUSB();
@@ -545,6 +668,9 @@ public class Main extends javax.swing.JFrame {
         } else {
             this.cbPrinters.setSelectedIndex(0);
         }
+
+        //Map find printers
+        mapDiscoveredPrinters = new HashMap<>();
     }
 
     private void cleanUSBFields() {
@@ -590,12 +716,18 @@ public class Main extends javax.swing.JFrame {
 
     private void cleanTextArea() {
         this.txtZplCode.setText("^XA^POI^LH0,0^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ");
+        this.txtZplCodeGen.setText("");
+        this.txtPrinterProperties.setText("");
     }
 
     private void loadDriversPrintersUSB() {
         ZplCustomUtils.getListPrinterByFilter(OptionConnect.USB).forEach(dp -> {
             this.cbPrinters.addItem(dp.printerName);
         });
+    }
+
+    public static void infoBox(final String infoMessage, String titleBar) {
+        JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
     }
 
     // ############ End private methods ###############
@@ -640,23 +772,31 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JButton btnProcessImage;
     private javax.swing.JButton btnSelectFile;
     private javax.swing.JButton btnSendPrinter;
+    private javax.swing.JComboBox<String> cbDiscoveredPrinters;
     private javax.swing.JComboBox<String> cbPrinters;
     private javax.swing.JCheckBox chkKeepData;
     private javax.swing.JSpinner fontSizeSpinner;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JSpinner marginLeftSpinner;
@@ -667,7 +807,9 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JSpinner spaceLineSpinner;
     private javax.swing.JTextField txtFilePath;
     private javax.swing.JTextField txtIpAddress;
+    private javax.swing.JTextField txtIpRange;
     private javax.swing.JTextField txtPortNro;
+    private javax.swing.JTextArea txtPrinterProperties;
     private javax.swing.JTextArea txtZplCode;
     private javax.swing.JTextArea txtZplCodeGen;
     private javax.swing.JTextArea txtZplImageCode;

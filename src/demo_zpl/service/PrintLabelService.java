@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * @author davidgomez
  */
-public class PrintLabel {
+public class PrintLabelService {
 
     private void sendTestToPrint(final String usbName, final String ipAddress, final int port, final String option) {
         if (option.equals(OptionConnect.USB)) {
