@@ -6,6 +6,7 @@
 package demo_zpl.utils;
 
 import com.zebra.sdk.comm.ConnectionException;
+import com.zebra.sdk.printer.discovery.DiscoveredPrinterDriver;
 import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
 import com.zebra.sdk.printer.discovery.UsbDiscoverer;
 import com.zebra.sdk.printer.discovery.ZebraPrinterFilter;
@@ -52,19 +53,19 @@ public class ZplCustomUtils {
         return array;
     }
 
-    public static List<DiscoveredUsbPrinter> getListPrinterByFilter(final OptionConnect option) {
-        final List<DiscoveredUsbPrinter> printerList = new ArrayList<>();
+    public static List<DiscoveredPrinterDriver> getListPrinterByFilter(final OptionConnect option) {
+        final List<DiscoveredPrinterDriver> printerDriverList = new ArrayList<>();
         try {
             if (option.equals(OptionConnect.USB)) {
-                for (DiscoveredUsbPrinter printer : UsbDiscoverer.getZebraUsbPrinters(new ZebraPrinterFilter())) {
-                    printerList.add(printer);
+                for (DiscoveredPrinterDriver printer : UsbDiscoverer.getZebraDriverPrinters()) {
+                    printerDriverList.add(printer);
                 }
             } else {
                 //NetworkDiscoverer.localBroadcast(new DiscoveryHandlerImpl(discoverButton));
             }
         } catch (ConnectionException ex) {
-            return printerList;
+            return printerDriverList;
         }
-        return printerList;
+        return printerDriverList;
     }
 }

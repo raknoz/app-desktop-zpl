@@ -1,8 +1,5 @@
 package demo_zpl.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import demo_zpl.dto.ReceiptDto;
 import demo_zpl.utils.FileUtils;
 import java.io.IOException;
 
@@ -61,17 +58,5 @@ public class MockFactory {
                 + "QhEnJJmjvmpwCNmPI+nmeY94mO2UX+CxN+QToDISRWbYnaUuxI+gT77Wtoq2f8JSD1wbzyppCc96UlPetKTnv"
                 + "Tkm5T/AWQHiGU=:AB45";
         /* End image */
-    }
-
-    public static String processTemplate() throws IOException {
-        final ReceiptDto receiptDto = buildReceiptDtoDto("layawayTransaction_mx.json");
-        return "";
-    }
-
-    private static ReceiptDto buildReceiptDtoDto(final String fileName) throws IOException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        final String requestPayload = FileUtils.castFileToStringUTF8(fileName);
-        return objectMapper.readValue(requestPayload, ReceiptDto.class);
     }
 }

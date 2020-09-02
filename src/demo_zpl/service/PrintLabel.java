@@ -27,33 +27,12 @@ public class PrintLabel {
         }
     }
 
-    private void sendFileToPrinter(final String filePath) {
-        Connection printerConnection = null;
-        try {
-            printerConnection = ConnectionUtil.getConnectionIP("127.0.0.1", 9100);
-            printerConnection.open();
-            final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-            printer.sendFileContents(filePath);
-        } catch (ConnectionException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (printerConnection != null) {
-                    printerConnection.close();
-                }
-            } catch (ConnectionException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     public Boolean sendLabelToPrintIP(final String ipAddress, final int port, final String zebraLabel) {
         Connection printerConnection = null;
         try {
             printerConnection = ConnectionUtil.getConnectionIP(ipAddress, port);
             printerConnection.open();
-            final ZebraPrinter printer = ZebraPrinterFactory.getInstance(PrinterLanguage.ZPL, printerConnection);
-            printer.sendCommand(zebraLabel);
+            printerConnection.write(zebraLabel.getBytes(StandardCharsets.UTF_8));
         } catch (ConnectionException ex) {
             ex.printStackTrace();
             return false;
@@ -76,7 +55,7 @@ public class PrintLabel {
             printerConnection = ConnectionUtil.getConnectionUSB(usbName);
             printerConnection.open();
             printerConnection.write(zebraLabel.getBytes(StandardCharsets.UTF_8));
-        } catch (Exception ex) {
+        } catch (ConnectionException ex) {
             ex.printStackTrace();
             return false;
         } finally {
@@ -107,6 +86,6 @@ public class PrintLabel {
      * 
      */
     private String getTestLabel() {
-        return "^XA^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ";
+        return "^XA^POI^LH0,0^FO17,16^GB379,371,8^FS^FT65,255^A0N,135,134^FDTEST^FS^XZ";
     }
 }
