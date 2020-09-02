@@ -233,7 +233,7 @@ public class ImageConverterService {
     }
 
     public static String main(final String filePath) throws IOException {
-        //int scaledWidth = 1024;
+        //int scaledWidth = 700;
         //int scaledHeight = 768;
         //final BufferedImage originalImage = ImageIO.read(ImageResizer.resize(filePath, scaledWidth, scaledHeight));
         BufferedImage originalImage = ImageIO.read(new File(filePath));

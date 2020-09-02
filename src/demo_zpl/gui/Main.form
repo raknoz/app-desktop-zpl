@@ -548,6 +548,7 @@
                           <Component id="txtIpRange" min="-2" pref="266" max="-2" attributes="0"/>
                           <Component id="cbDiscoveredPrinters" min="-2" pref="256" max="-2" attributes="0"/>
                           <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblCountDownSearch" alignment="0" min="-2" pref="188" max="-2" attributes="0"/>
                       </Group>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
@@ -589,10 +590,14 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="cbDiscoveredPrinters" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="cbDiscoveredPrinters" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                              <Component id="lblCountDownSearch" min="-2" pref="25" max="-2" attributes="0"/>
+                          </Group>
                           <Component id="jScrollPane5" min="-2" pref="560" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="48" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -659,6 +664,18 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Format: ###.###.###.###-###"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JLabel" name="lblCountDownSearch">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                    <EtchetBorder/>
+                  </Border>
+                </Property>
+              </Properties>
+              <AccessibilityProperties>
+                <Property name="AccessibleContext.accessibleName" type="java.lang.String" value=""/>
+              </AccessibilityProperties>
             </Component>
           </SubComponents>
         </Container>

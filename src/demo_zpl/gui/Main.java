@@ -5,26 +5,21 @@
  */
 package demo_zpl.gui;
 
-import com.zebra.sdk.printer.discovery.DiscoveredPrinter;
 import demo_zpl.dto.DiscoveredPrinterDto;
 import demo_zpl.enums.OptionConnect;
-import demo_zpl.listeners.ItemChangeListener;
 import demo_zpl.service.FindPrinterService;
 import demo_zpl.service.PrintLabelService;
 import demo_zpl.service.ImageConverterService;
 import demo_zpl.utils.ZplCustomUtils;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
@@ -105,6 +100,7 @@ public class Main extends javax.swing.JFrame {
         cbDiscoveredPrinters = new javax.swing.JComboBox<>();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
+        lblCountDownSearch = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Zpl POC");
@@ -430,6 +426,8 @@ public class Main extends javax.swing.JFrame {
 
         jLabel11.setText("Format: ###.###.###.###-###");
 
+        lblCountDownSearch.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -442,7 +440,8 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(jLabel9)
                     .addComponent(txtIpRange, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11))
+                    .addComponent(jLabel11)
+                    .addComponent(lblCountDownSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGap(60, 60, 60)
@@ -473,10 +472,15 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(jLabel10))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26)
+                        .addComponent(lblCountDownSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 560, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
+
+        lblCountDownSearch.getAccessibleContext().setAccessibleName("");
 
         jTabbedPane1.addTab("Find Printers", jPanel4);
 
@@ -587,20 +591,24 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try {
+            this.setEnabled(false);
             final FindPrinterService fps = new FindPrinterService();
             final List<DiscoveredPrinterDto> printers = fps.findPrinter(this.txtIpRange.getText());
-
             if (printers != null && !printers.isEmpty()) {
                 for (final DiscoveredPrinterDto printer : printers) {
-                    this.cbDiscoveredPrinters.addItem(printer.getIpAddress());
                     mapDiscoveredPrinters.put(printer.getIpAddress(), printer.getStrProperties());
+                    this.cbDiscoveredPrinters.addItem(printer.getIpAddress());
                 }
+                this.cbDiscoveredPrinters.setEnabled(true);
             } else {
                 infoBox("No results!", "Find printers");
             }
+
         } catch (Exception e) {
             infoBox(e.getMessage(), "Find printers");
         }
+
+        this.setEnabled(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void txtIpRangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIpRangeActionPerformed
@@ -648,7 +656,10 @@ public class Main extends javax.swing.JFrame {
         this.rbOptWifi.doClick();
 
         // 
-        this.cbDiscoveredPrinters.addItemListener(new ItemChangeListener());
+        this.cbDiscoveredPrinters.addItemListener((ItemEvent event) -> {
+            final String item = (String) event.getItem();
+            displayDataPrinter(item);
+        });
         this.cbDiscoveredPrinters.setEditable(false);
         this.cbDiscoveredPrinters.setEnabled(false);
 
@@ -661,7 +672,7 @@ public class Main extends javax.swing.JFrame {
         //Classes
         printLabel = new PrintLabelService();
 
-        //Printers
+        //Printers USB
         loadDriversPrintersUSB();
         if (this.cbPrinters.getItemCount() == 0) {
             this.cbPrinters.setSelectedIndex(-1);
@@ -671,6 +682,9 @@ public class Main extends javax.swing.JFrame {
 
         //Map find printers
         mapDiscoveredPrinters = new HashMap<>();
+
+        //Find Priter
+        this.txtIpRange.setText("192.168.0.1-*");
     }
 
     private void cleanUSBFields() {
@@ -726,8 +740,16 @@ public class Main extends javax.swing.JFrame {
         });
     }
 
-    public static void infoBox(final String infoMessage, String titleBar) {
+    private void infoBox(final String infoMessage, final String titleBar) {
         JOptionPane.showMessageDialog(null, infoMessage, "InfoBox: " + titleBar, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void displayDataPrinter(final String ipAddress) {
+        this.txtPrinterProperties.setText(mapDiscoveredPrinters.get(ipAddress));
+    }
+
+    private void waitingDialog(final String infoMessage, final String titleBar) {
+        JOptionPane.showOptionDialog(null, infoMessage, titleBar, JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[]{}, null);
     }
 
     // ############ End private methods ###############
@@ -798,6 +820,7 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblCountDownSearch;
     private javax.swing.JLabel lblStatus;
     private javax.swing.JSpinner marginLeftSpinner;
     private javax.swing.JSpinner marginTopSpiner;

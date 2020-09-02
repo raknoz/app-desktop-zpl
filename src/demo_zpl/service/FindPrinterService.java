@@ -37,11 +37,12 @@ public class FindPrinterService {
         }
     };
 
-    public List<DiscoveredPrinterDto> findPrinter(final String range) throws Exception {
+    public synchronized List<DiscoveredPrinterDto> findPrinter(final String range) throws Exception {
         final DiscoveryHandlerImpl discoveryHandler = new DiscoveryHandlerImpl();
         try {
             System.out.println("Starting printer discovery.");
-            NetworkDiscoverer.subnetSearch(discoveryHandler, range);
+            NetworkDiscoverer.subnetSearch(discoveryHandler, range, 6000);
+            Thread.sleep(8000);
         } catch (DiscoveryException de) {
             de.printStackTrace();
             throw new Exception(de.getMessage());
