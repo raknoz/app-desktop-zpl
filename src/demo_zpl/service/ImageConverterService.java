@@ -3,7 +3,6 @@ package demo_zpl.service;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -59,12 +58,12 @@ public class ImageConverterService {
         MAP_CODE.put(400, "z");
     }
 
-    private String convertImgageToZpl(BufferedImage image, final int blacknessLimitPercentage) {
+    private static String convertImgageToZpl(final BufferedImage image, final int blacknessLimitPercentage) {
         final ImageZpl imageZpl = processImage(image, blacknessLimitPercentage);
 
         return String.format("^XA \n^POI \n^LH0,0 \n^PW804 \n^LL%d "
                 + "\n^FO45,25^GFA, %d, %d, %d, %s ^FS \n^XZ",
-                image.getHeight() < 200? 200 : image.getHeight() + 10,
+                image.getHeight() < 200 ? 200 : image.getHeight() + 10,
                 imageZpl.getBinaryByteCount(),
                 imageZpl.getGraphicFieldCount(),
                 imageZpl.getBytesPerRow(),
@@ -72,7 +71,7 @@ public class ImageConverterService {
         );
     }
 
-    private ImageZpl processImage(final BufferedImage originalImage, final int blacknessLimitPercentage) {
+    private static ImageZpl processImage(final BufferedImage originalImage, final int blacknessLimitPercentage) {
         final StringBuilder sb = new StringBuilder();
         final Graphics2D graphics = originalImage.createGraphics();
         graphics.drawImage(originalImage, 0, 0, null);
@@ -110,7 +109,7 @@ public class ImageConverterService {
         return new ImageZpl(totalBytes, totalBytes, bytesPerRow, encodeHexAscii(sb.toString(), bytesPerRow));
     }
 
-    private String fourByteBinary(String binaryStr) {
+    private static String fourByteBinary(String binaryStr) {
         int decimal = Integer.parseInt(binaryStr, 2);
         if (decimal > 15) {
             return Integer.toString(decimal, 16).toUpperCase();
@@ -119,7 +118,7 @@ public class ImageConverterService {
         }
     }
 
-    private String encodeHexAscii(final String code, final int widthBytes) {
+    private static String encodeHexAscii(final String code, final int widthBytes) {
         int maxLine = widthBytes * 2;
         StringBuilder sbCode = new StringBuilder();
         StringBuilder sbLinea = new StringBuilder();
@@ -222,22 +221,12 @@ public class ImageConverterService {
         }
     }
 
-    private BufferedImage convertCMYK2RGB(BufferedImage image) throws IOException {
-        //Create a new RGB image
-        BufferedImage rgbImage = new BufferedImage(image.getWidth(), image.getHeight(),
-                BufferedImage.TYPE_3BYTE_BGR);
-        // then do a funky color convert
-        ColorConvertOp op = new ColorConvertOp(null);
-        op.filter(image, rgbImage);
-        return rgbImage;
-    }
+    public static String main(final String filePath) throws IOException, Exception {
+        final BufferedImage originalImage = ImageIO.read(new File(filePath));
 
-    public static String main(final String filePath) throws IOException {
-        //int scaledWidth = 700;
-        //int scaledHeight = 768;
-        //final BufferedImage originalImage = ImageIO.read(ImageResizer.resize(filePath, scaledWidth, scaledHeight));
-        BufferedImage originalImage = ImageIO.read(new File(filePath));
-        final ImageConverterService zp = new ImageConverterService();
-        return zp.convertImgageToZpl(originalImage, 50);
+        if (originalImage.getWidth() > 700 || originalImage.getHeight() > 200) {
+            throw new Exception("Imagen fuera de rango");
+        }
+        return convertImgageToZpl(originalImage, 50);
     }
 }

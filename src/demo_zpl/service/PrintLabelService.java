@@ -7,9 +7,6 @@ package demo_zpl.service;
 
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
-import com.zebra.sdk.printer.PrinterLanguage;
-import com.zebra.sdk.printer.ZebraPrinter;
-import com.zebra.sdk.printer.ZebraPrinterFactory;
 import demo_zpl.enums.OptionConnect;
 import demo_zpl.utils.ConnectionUtil;
 import java.nio.charset.StandardCharsets;
