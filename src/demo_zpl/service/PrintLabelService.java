@@ -7,7 +7,6 @@ package demo_zpl.service;
 
 import com.zebra.sdk.comm.Connection;
 import com.zebra.sdk.comm.ConnectionException;
-import demo_zpl.enums.OptionConnect;
 import demo_zpl.utils.ConnectionUtil;
 import java.nio.charset.StandardCharsets;
 
@@ -16,56 +15,52 @@ import java.nio.charset.StandardCharsets;
  */
 public class PrintLabelService {
 
-    private void sendTestToPrint(final String usbName, final String ipAddress, final int port, final String option) {
-        if (option.equals(OptionConnect.USB)) {
-            this.sendLabelToPrintUSB(usbName, getTestLabel());
-        } else {
-            this.sendLabelToPrintIP(ipAddress, port, getTestLabel());
-        }
-    }
-
-    public Boolean sendLabelToPrintIP(final String ipAddress, final int port, final String zebraLabel) {
+    public void sendLabelToPrintIP(final String ipAddress, final int port, final String zebraLabel) throws ConnectionException, Exception {
         Connection printerConnection = null;
         try {
             printerConnection = ConnectionUtil.getConnectionIP(ipAddress, port);
             printerConnection.open();
             printerConnection.write(zebraLabel.getBytes(StandardCharsets.UTF_8));
-        } catch (ConnectionException ex) {
+        } catch (final ConnectionException ex) {
             ex.printStackTrace();
-            return false;
+            throw new ConnectionException("Connection fail");
+        } catch (final Exception ex) {
+            ex.printStackTrace();
+            throw new Exception("Error in function");
         } finally {
             try {
                 if (printerConnection != null) {
                     printerConnection.close();
                 }
-            } catch (ConnectionException e) {
+            } catch (final ConnectionException e) {
                 e.printStackTrace();
-                return false;
+                throw new ConnectionException("Connection fail");
             }
         }
-        return true;
     }
 
-    public Boolean sendLabelToPrintUSB(final String usbName, final String zebraLabel) {
+    public void sendLabelToPrintUSB(final String usbName, final String zebraLabel) throws ConnectionException, Exception {
         Connection printerConnection = null;
         try {
             printerConnection = ConnectionUtil.getConnectionUSB(usbName);
             printerConnection.open();
             printerConnection.write(zebraLabel.getBytes(StandardCharsets.UTF_8));
-        } catch (ConnectionException ex) {
+        } catch (final ConnectionException ex) {
             ex.printStackTrace();
-            return false;
+            throw new ConnectionException("Connection fail");
+        } catch (final Exception ex) {
+            ex.printStackTrace();
+            throw new Exception("Error in function");
         } finally {
             try {
                 if (printerConnection != null) {
                     printerConnection.close();
                 }
-            } catch (ConnectionException e) {
+            } catch (final ConnectionException e) {
                 e.printStackTrace();
-                return false;
+                throw new ConnectionException("Connection fail");
             }
         }
-        return true;
     }
 
     /*

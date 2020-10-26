@@ -1,7 +1,7 @@
 package demo_zpl.enums;
 
 public enum OptionConnect {
-    WIRELESS_CONNECT("WIFI"), USB("USB");
+    WIRELESS_CONNECT("WIFI"), USB_CONNECT("USB");
 
     private final String type;
 

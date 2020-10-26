@@ -5,33 +5,22 @@
  */
 package demo_zpl.gui;
 
-import demo_zpl.dto.DiscoveredPrinterDto;
+import demo_zpl.dto.DataToPrintDTO;
 import demo_zpl.enums.OptionConnect;
-import demo_zpl.service.FindPrinterService;
-import demo_zpl.service.PrintLabelService;
-import demo_zpl.service.ImageConverterService;
 import demo_zpl.service.workers.ProcessImageWorker;
+import demo_zpl.service.workers.SearchPrinterWorker;
+import demo_zpl.service.workers.SendToPrintWorker;
+import demo_zpl.utils.GuiUtils;
 import demo_zpl.utils.ZplCustomUtils;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.InputMap;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -46,10 +35,10 @@ import javax.swing.text.PlainDocument;
 public class Main extends javax.swing.JFrame {
 
     private String filePath;
-    private PrintLabelService printLabel;
     private Map<String, String> mapDiscoveredPrinters;
     private final static String NUMBER_PORT_DEFAULT = "6101";
     private final static String REGULAR_EXPRESION_IP_DEFAULT = "192.168.0.1-*";
+    private OptionConnect connectionSelected;
 
     /**
      * Creates new form Main
@@ -57,7 +46,7 @@ public class Main extends javax.swing.JFrame {
     public Main() {
         initComponents();
         setup();
-        centreWindow(this);
+        GuiUtils.centreWindow(this);
     }
 
     /**
@@ -70,6 +59,7 @@ public class Main extends javax.swing.JFrame {
     private void initComponents() {
 
         rbGroup = new javax.swing.ButtonGroup();
+        rbgFindPrinters = new javax.swing.ButtonGroup();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         marginLeftSpinner = new javax.swing.JSpinner();
@@ -84,40 +74,37 @@ public class Main extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtZplCodeGen = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
-        btnClear = new javax.swing.JButton();
-        btnProcessImage = new javax.swing.JButton();
-        btnSelectFile = new javax.swing.JButton();
-        txtFilePath = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtZplImageCode = new javax.swing.JTextArea();
+        jPanel7 = new javax.swing.JPanel();
+        btnSelectFile = new javax.swing.JButton();
+        txtFilePath = new javax.swing.JTextField();
+        btnClearImageContent = new javax.swing.JButton();
+        btnProcessImage = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        txtIpAddress = new javax.swing.JTextField();
-        btnSendPrinter = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        txtPortNro = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtInputZplCode = new javax.swing.JTextArea();
-        rbOptWifi = new javax.swing.JRadioButton();
-        rbOptUsb = new javax.swing.JRadioButton();
+        panelConnction = new javax.swing.JPanel();
+        rbSendPrinterWifi = new javax.swing.JRadioButton();
+        rbSendPrinterUsb = new javax.swing.JRadioButton();
+        jLabel5 = new javax.swing.JLabel();
+        txtIpAddress = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        txtPortNro = new javax.swing.JTextField();
+        btnSendPrinter = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        cbPrinters = new javax.swing.JComboBox<>();
         lblStatus = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        cbPrinters = new javax.swing.JComboBox<>();
         btnResetInput = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        btnSearchIps = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
-        btnSearchPrinters = new javax.swing.JButton();
-        txtIpRange = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        txtPrinterProperties = new javax.swing.JTextArea();
         jLabel9 = new javax.swing.JLabel();
         cbDiscoveredPrinters = new javax.swing.JComboBox<>();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
-        pbFindPrinter = new javax.swing.JProgressBar();
+        jPanel5 = new javax.swing.JPanel();
+        btnSearchPrinters = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtPrinterProperties = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Zpl POC");
@@ -165,7 +152,7 @@ public class Main extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1041, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1196, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
@@ -211,20 +198,13 @@ public class Main extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Generate code", jPanel1);
 
-        btnClear.setText("Clear");
-        btnClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearActionPerformed(evt);
-            }
-        });
+        txtZplImageCode.setEditable(false);
+        txtZplImageCode.setColumns(20);
+        txtZplImageCode.setLineWrap(true);
+        txtZplImageCode.setRows(100);
+        jScrollPane2.setViewportView(txtZplImageCode);
 
-        btnProcessImage.setText("Generate zpl logo");
-        btnProcessImage.setEnabled(false);
-        btnProcessImage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnProcessImageActionPerformed(evt);
-            }
-        });
+        jPanel7.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         btnSelectFile.setText("Select File");
         btnSelectFile.addActionListener(new java.awt.event.ActionListener() {
@@ -236,11 +216,53 @@ public class Main extends javax.swing.JFrame {
         txtFilePath.setEditable(false);
         txtFilePath.setText("Select a image file ...");
 
-        txtZplImageCode.setEditable(false);
-        txtZplImageCode.setColumns(20);
-        txtZplImageCode.setLineWrap(true);
-        txtZplImageCode.setRows(100);
-        jScrollPane2.setViewportView(txtZplImageCode);
+        btnClearImageContent.setText("Clear");
+        btnClearImageContent.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearImageContentActionPerformed(evt);
+            }
+        });
+
+        btnProcessImage.setText("Generate zpl logo");
+        btnProcessImage.setEnabled(false);
+        btnProcessImage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProcessImageActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnSelectFile, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                        .addComponent(btnClearImageContent)
+                        .addGap(548, 548, 548)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnProcessImage, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(316, 316, 316))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnSelectFile))
+                        .addGap(50, 50, 50)
+                        .addComponent(btnClearImageContent))
+                    .addComponent(btnProcessImage, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -249,52 +271,50 @@ public class Main extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1041, Short.MAX_VALUE)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(btnClear)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(51, 51, 51)
-                        .addComponent(btnSelectFile, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnProcessImage, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(47, 47, 47))))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1196, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnProcessImage, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFilePath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSelectFile))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnClear)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 590, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("Generate Image", jPanel2);
+
+        txtInputZplCode.setColumns(20);
+        txtInputZplCode.setLineWrap(true);
+        txtInputZplCode.setRows(100);
+        jScrollPane3.setViewportView(txtInputZplCode);
+
+        panelConnction.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        rbSendPrinterWifi.setText("Wifi connection");
+        rbSendPrinterWifi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbSendPrinterWifiActionPerformed(evt);
+            }
+        });
+
+        rbSendPrinterUsb.setText("USB connection");
+        rbSendPrinterUsb.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbSendPrinterUsbActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("IP:");
 
         txtIpAddress.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtIpAddressKeyTyped(evt);
             }
         });
-
-        btnSendPrinter.setText("Send printer");
-        btnSendPrinter.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSendPrinterActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setText("IP:");
 
         jLabel6.setText("Port:");
 
@@ -306,26 +326,14 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
+        btnSendPrinter.setText("Send printer");
+        btnSendPrinter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSendPrinterActionPerformed(evt);
+            }
+        });
+
         jLabel7.setText("USB Printers:");
-
-        txtInputZplCode.setColumns(20);
-        txtInputZplCode.setLineWrap(true);
-        txtInputZplCode.setRows(100);
-        jScrollPane3.setViewportView(txtInputZplCode);
-
-        rbOptWifi.setText("Wifi connection");
-        rbOptWifi.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbOptWifiActionPerformed(evt);
-            }
-        });
-
-        rbOptUsb.setText("USB connection");
-        rbOptUsb.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rbOptUsbActionPerformed(evt);
-            }
-        });
 
         lblStatus.setFont(new java.awt.Font("Ubuntu", 1, 12)); // NOI18N
         lblStatus.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -346,172 +354,174 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.setEnabled(false);
-
-        btnSearchIps.setToolTipText("");
-        btnSearchIps.setEnabled(false);
-        btnSearchIps.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchIpsActionPerformed(evt);
-            }
-        });
+        javax.swing.GroupLayout panelConnctionLayout = new javax.swing.GroupLayout(panelConnction);
+        panelConnction.setLayout(panelConnctionLayout);
+        panelConnctionLayout.setHorizontalGroup(
+            panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelConnctionLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(panelConnctionLayout.createSequentialGroup()
+                        .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelConnctionLayout.createSequentialGroup()
+                                .addComponent(rbSendPrinterWifi)
+                                .addGap(18, 18, 18)
+                                .addComponent(rbSendPrinterUsb)
+                                .addGap(97, 97, 97)
+                                .addComponent(jLabel6)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtPortNro, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelConnctionLayout.createSequentialGroup()
+                                .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel7))
+                                .addGap(18, 18, 18)
+                                .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 272, Short.MAX_VALUE)
+                        .addComponent(btnSendPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelConnctionLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(145, 145, 145)
+                        .addComponent(jButton1)
+                        .addGap(65, 65, 65)
+                        .addComponent(btnResetInput, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(194, 194, 194))
+        );
+        panelConnctionLayout.setVerticalGroup(
+            panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelConnctionLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelConnctionLayout.createSequentialGroup()
+                        .addComponent(btnSendPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 28, Short.MAX_VALUE)
+                        .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnResetInput)
+                            .addComponent(jButton1)
+                            .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(panelConnctionLayout.createSequentialGroup()
+                        .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(rbSendPrinterWifi)
+                            .addComponent(rbSendPrinterUsb))
+                        .addGap(18, 18, 18)
+                        .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(txtPortNro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5)
+                            .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(panelConnctionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cbPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane3)
-                        .addContainerGap())
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel7))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(cbPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(55, 55, 55)
-                                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addComponent(jComboBox1, 0, 186, Short.MAX_VALUE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(btnSearchIps, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel6)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(txtPortNro, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(153, 153, 153))))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(rbOptWifi)
-                                .addGap(18, 18, 18)
-                                .addComponent(rbOptUsb)
-                                .addGap(112, 112, 112)))
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addGap(28, 28, 28)
-                                .addComponent(btnResetInput, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnSendPrinter, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(51, 51, 51))))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(panelConnction, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1196, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(rbOptWifi)
-                            .addComponent(rbOptUsb))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSearchIps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel6)
-                                .addComponent(txtPortNro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel5)
-                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(cbPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblStatus))
-                        .addGap(24, 24, 24))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(btnSendPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
-                            .addComponent(btnResetInput))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
+                .addComponent(panelConnction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("Send to Print", jPanel3);
 
-        btnSearchPrinters.setText("Search Printers");
+        jLabel9.setText("Priters founded:");
+
+        jPanel5.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        btnSearchPrinters.setText("Search Local Printers");
         btnSearchPrinters.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSearchPrintersActionPerformed(evt);
             }
         });
 
-        txtIpRange.setToolTipText("Format: ###.###.###.###-###");
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(435, 435, 435)
+                .addComponent(btnSearchPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnSearchPrinters, javax.swing.GroupLayout.DEFAULT_SIZE, 85, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
-        jLabel8.setText("IP Range:");
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Properties"));
 
         txtPrinterProperties.setEditable(false);
         txtPrinterProperties.setColumns(20);
         txtPrinterProperties.setRows(5);
         jScrollPane5.setViewportView(txtPrinterProperties);
 
-        jLabel9.setText("Priters founded:");
-
-        jLabel10.setText("Properties");
-
-        jLabel11.setText("Format: ###.###.###.###-###");
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5)
+        );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(51, 51, 51)
-                .addComponent(jLabel8)
-                .addGap(28, 28, 28)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel9)
-                    .addComponent(txtIpRange, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-                    .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11)
-                    .addComponent(pbFindPrinter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(45, 45, 45)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(60, 60, 60)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel10))
-                        .addContainerGap(39, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnSearchPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(191, 191, 191))))
+                    .addComponent(jLabel9)
+                    .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(75, 75, 75)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(267, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(35, 35, 35)
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtIpRange, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8)))
-                    .addComponent(btnSearchPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel10))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(65, 65, 65)
+                        .addComponent(jLabel9)
+                        .addGap(18, 18, 18)
                         .addComponent(cbDiscoveredPrinters, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pbFindPrinter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 560, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(48, Short.MAX_VALUE))
+                        .addContainerGap(524, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())))
         );
 
         jTabbedPane1.addTab("Find Printers", jPanel4);
@@ -520,17 +530,11 @@ public class Main extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jTabbedPane1)
-                .addContainerGap())
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jTabbedPane1)
-                .addContainerGap())
+            .addComponent(jTabbedPane1)
         );
 
         pack();
@@ -544,27 +548,24 @@ public class Main extends javax.swing.JFrame {
         jfc.showOpenDialog(null);
         File fileChoose = jfc.getSelectedFile();
         if (fileChoose != null) {
-            txtFilePath.setText(fileChoose.getAbsolutePath());
+            txtFilePath.setText(fileChoose.getAbsolutePath().trim());
             btnProcessImage.setEnabled(true);
-            this.filePath = fileChoose.getAbsolutePath();
+            this.filePath = fileChoose.getAbsolutePath().trim();
         }
     }//GEN-LAST:event_btnSelectFileActionPerformed
 
     private void btnProcessImageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcessImageActionPerformed
         this.txtZplImageCode.setText("");
-        ProcessImageWorker piw = new ProcessImageWorker(this.btnProcessImage, this.txtZplImageCode, this.filePath);
-        try {
-            piw.process();
-        } catch (Exception ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        final ProcessImageWorker piw
+                = new ProcessImageWorker(this.btnProcessImage, this.txtZplImageCode, this.filePath);
+        piw.execute();
     }//GEN-LAST:event_btnProcessImageActionPerformed
 
-    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+    private void btnClearImageContentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearImageContentActionPerformed
         // TODO add your handling code here:
-        this.txtZplCodeGen.setText("");
+        this.txtZplImageCode.setText("");
         this.txtFilePath.setText("");
-    }//GEN-LAST:event_btnClearActionPerformed
+    }//GEN-LAST:event_btnClearImageContentActionPerformed
 
     private void btnGenerateCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateCodeActionPerformed
         // TODO add your handling code here:
@@ -584,102 +585,82 @@ public class Main extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtPortNroKeyTyped
 
-    private void rbOptUsbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbOptUsbActionPerformed
+    private void rbSendPrinterUsbActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbSendPrinterUsbActionPerformed
         this.selectOpcUSB();
-        this.resetLabelStatus();
-    }//GEN-LAST:event_rbOptUsbActionPerformed
+        GuiUtils.resetLabelStatus(lblStatus);
+    }//GEN-LAST:event_rbSendPrinterUsbActionPerformed
 
-    private void rbOptWifiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbOptWifiActionPerformed
+    private void rbSendPrinterWifiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbSendPrinterWifiActionPerformed
         this.selectOpcWifi();
-        this.resetLabelStatus();
-    }//GEN-LAST:event_rbOptWifiActionPerformed
+        GuiUtils.resetLabelStatus(lblStatus);
+    }//GEN-LAST:event_rbSendPrinterWifiActionPerformed
 
     private void btnSendPrinterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendPrinterActionPerformed
         /*
         You can use the following regular expression to check if a string is base64 encoded or not:
-
         ^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$
         In base64 encoding, the character set is [A-Z, a-z, 0-9, and + /]. 
         If the rest length is less than 4, the string is padded with '=' characters.
         ^([A-Za-z0-9+/]{4})* means the string starts with 0 or more base64 groups.
-
         ([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$ 
         means the string ends in one of three forms: [A-Za-z0-9+/]{4}, [A-Za-z0-9+/]{3}= or [A-Za-z0-9+/]{2}==.
          */
-        resetLabelStatus();
-        boolean flagPrinter = false;
-        if (this.rbOptWifi.isSelected()) {
-            this.btnSendPrinter.setEnabled(false);
-            flagPrinter = printLabel.sendLabelToPrintIP(
-                    this.txtIpAddress.getText(),
-                    Integer.parseInt(this.txtPortNro.getText()),
-                    this.txtInputZplCode.getText());
-        } else {
-            flagPrinter = printLabel.sendLabelToPrintUSB(
-                    String.valueOf(this.cbPrinters.getSelectedItem()),
-                    this.txtInputZplCode.getText());
-        }
-        if (flagPrinter) {
-            updateStatusBarOnGui("Done...", Color.GREEN, false);
-        } else {
-            updateStatusBarOnGui("Conecction Failed...", Color.RED, false);
-        }
-        this.btnSendPrinter.setText("Send printer");
-        this.btnSendPrinter.setEnabled(true);
+
+        //Falta validacion IP y PORT y Combo de nombre de la printer
+        final DataToPrintDTO dataToPrintDTO
+                = new DataToPrintDTO(this.txtIpAddress.getText().trim(),
+                        Integer.parseInt(this.txtPortNro.getText().trim()),
+                        String.valueOf(this.cbPrinters.getSelectedItem()),
+                        this.connectionSelected,
+                        this.txtInputZplCode.getText());
+
+        final SendToPrintWorker worker = new SendToPrintWorker(this.panelConnction,
+                this.lblStatus, this.btnSendPrinter, dataToPrintDTO);
+        worker.execute();
     }//GEN-LAST:event_btnSendPrinterActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         this.txtInputZplCode.setText("");
+        this.txtIpAddress.setText("");
+        this.txtPortNro.setText("");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btnSearchPrintersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchPrintersActionPerformed
-        this.btnSearchPrinters.setText("Searching... ");
-        try {
-            this.setEnabled(false);
-            final FindPrinterService fps = new FindPrinterService();
-            final List<DiscoveredPrinterDto> printers = fps.findPrinter(this.txtIpRange.getText());
-            if (printers != null && !printers.isEmpty()) {
-                for (final DiscoveredPrinterDto printer : printers) {
-                    mapDiscoveredPrinters.put(printer.getIpAddress(), printer.getStrProperties());
-                    this.cbDiscoveredPrinters.addItem(printer.getIpAddress());
-                }
-                this.cbDiscoveredPrinters.setEnabled(true);
-            } else {
-                infoBox("No results!", "Find printers");
-            }
-
-        } catch (Exception e) {
-            infoBox(e.getMessage(), "Find printers");
-        }
-        this.btnSearchPrinters.setText("Search Printers");
-        this.setEnabled(true);
+        this.mapDiscoveredPrinters = new HashMap<>();
+        final SearchPrinterWorker spw
+                = new SearchPrinterWorker(this.btnSearchPrinters,
+                        this.cbDiscoveredPrinters,
+                        this.mapDiscoveredPrinters);
+        spw.execute();
     }//GEN-LAST:event_btnSearchPrintersActionPerformed
 
     private void btnResetInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetInputActionPerformed
         resetInputZplCode();
+        this.txtIpAddress.setText("");
+        this.txtPortNro.setText("6101");
     }//GEN-LAST:event_btnResetInputActionPerformed
 
-    private void btnSearchIpsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchIpsActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnSearchIpsActionPerformed
-
-    // ############ Private methods ###############
+    /*######################################################################## 
+    ########################################################################## 
+    ############################ Private methods #############################
+    ########################################################################## 
+    ##########################################################################*/
     //Class implemented to define the lenght of some textbox field
     class JTextFieldLimit extends PlainDocument {
 
-        private int limit;
+        private final int limit;
 
-        JTextFieldLimit(int limit) {
+        JTextFieldLimit(final int limit) {
             super();
             this.limit = limit;
         }
 
-        JTextFieldLimit(int limit, boolean upper) {
+        JTextFieldLimit(final int limit, final boolean upper) {
             super();
             this.limit = limit;
         }
 
-        public void insertString(int offset, String str, AttributeSet attr)
+        public void insertString(final int offset, final String str, final AttributeSet attr)
                 throws BadLocationException {
             if (str == null) {
                 return;
@@ -692,12 +673,6 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void setup() {
-        this.fontSizeSpinner.setValue(6);
-        this.marginLeftSpinner.setValue(15);
-        this.marginTopSpiner.setValue(50);
-        this.spaceLineSpinner.setValue(24);
-        this.txtPortNro.setDocument(new JTextFieldLimit(4));
-
         //Configuration for mac
         // Implemented from http://stackoverflow.com/questions/7252749/how-to-use-command-c-command-v-shortcut-in-mac-to-copy-paste-text#answer-7253059
         boolean isMacOs = (System.getProperty("os.name").toLowerCase().contains("mac"));
@@ -708,12 +683,48 @@ public class Main extends javax.swing.JFrame {
             im.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), DefaultEditorKit.cutAction);
         }
 
-        //Config Radio buttons
-        this.rbGroup.add(rbOptUsb);
-        this.rbGroup.add(rbOptWifi);
-        this.rbOptWifi.doClick();
+        configGenerateCodeTab();
+        configGenerateImageTab();
+        configSetToPrintTab();
+        configFindPrintersTab();
+    }
 
-        // 
+    private void configGenerateCodeTab() {
+        this.fontSizeSpinner.setValue(6);
+        this.marginLeftSpinner.setValue(15);
+        this.marginTopSpiner.setValue(50);
+        this.spaceLineSpinner.setValue(24);
+    }
+
+    private void configGenerateImageTab() {
+
+    }
+
+    private void configSetToPrintTab() {
+        //Config Radio buttons
+        this.rbGroup.add(this.rbSendPrinterUsb);
+        this.rbGroup.add(this.rbSendPrinterWifi);
+        this.rbSendPrinterWifi.doClick();
+
+        //reset fields
+        GuiUtils.resetLabelStatus(this.lblStatus);
+        cleanUSBFields();
+        cleanWIFIFields();
+        resetInputZplCode();
+
+        //Printers USB
+        loadDriversPrintersUSB();
+        this.cbPrinters.setSelectedIndex(
+                this.cbPrinters.getItemCount() > 0 ? 0 : -1
+        );
+
+        //Set default Connection Selected
+        this.connectionSelected = OptionConnect.WIRELESS_CONNECT;
+        //Limit characters in some textBox
+        this.txtPortNro.setDocument(new JTextFieldLimit(4));
+    }
+
+    private void configFindPrintersTab() {
         this.cbDiscoveredPrinters.addItemListener((ItemEvent event) -> {
             final String item = (String) event.getItem();
             displayDataPrinter(item);
@@ -721,28 +732,6 @@ public class Main extends javax.swing.JFrame {
         this.cbDiscoveredPrinters.setEditable(false);
         this.cbDiscoveredPrinters.setEnabled(false);
 
-        //reset
-        resetLabelStatus();
-        cleanUSBFields();
-        cleanWIFIFields();
-        resetInputZplCode();
-
-        //Classes
-        printLabel = new PrintLabelService();
-
-        //Printers USB
-        loadDriversPrintersUSB();
-        if (this.cbPrinters.getItemCount() == 0) {
-            this.cbPrinters.setSelectedIndex(-1);
-        } else {
-            this.cbPrinters.setSelectedIndex(0);
-        }
-
-        //Map find printers
-        mapDiscoveredPrinters = new HashMap<>();
-
-        //Find Priter
-        this.txtIpRange.setText(REGULAR_EXPRESION_IP_DEFAULT);
     }
 
     private void cleanUSBFields() {
@@ -755,43 +744,17 @@ public class Main extends javax.swing.JFrame {
     }
 
     private void selectOpcWifi() {
+        this.connectionSelected = OptionConnect.WIRELESS_CONNECT;
         this.cbPrinters.setEnabled(false);
         this.txtIpAddress.setEnabled(true);
         this.txtPortNro.setEnabled(true);
     }
 
     private void selectOpcUSB() {
+        this.connectionSelected = OptionConnect.USB_CONNECT;
         this.cbPrinters.setEnabled(true);
         this.txtIpAddress.setEnabled(false);
         this.txtPortNro.setEnabled(false);
-    }
-
-    private void resetLabelStatus() {
-        updateStatusBarOnGui("status", new Color(242, 241, 240), true);
-    }
-
-    private void updateStatusBarOnGui(final String statusMessage, final Color color, final boolean isReset) {
-        SwingUtilities.invokeLater(() -> {
-            this.lblStatus.setText(statusMessage);
-            this.lblStatus.setBackground(color);
-            this.lblStatus.setOpaque(!isReset);
-            Font font1 = new Font("Courier", Font.BOLD, 15);
-            this.lblStatus.setFont(font1);
-            this.lblStatus.repaint();
-        });
-    }
-
-    private void updateProgeressBarOnGui(final String statusMessage, final Color color, final boolean isReset) {
-        SwingUtilities.invokeLater(() -> {
-            this.pbFindPrinter.setMaximum(100);
-            this.pbFindPrinter.setIndeterminate(true);
-        });
-    }
-
-    private void updateCursor(final int cursor) {
-        SwingUtilities.invokeLater(() -> {
-            this.setCursor(Cursor.getPredefinedCursor(cursor));
-        });
     }
 
     private void resetInputZplCode() {
@@ -803,12 +766,10 @@ public class Main extends javax.swing.JFrame {
                 + "\n^GB379,371,8^FS"
                 + "\n^FT65,255^A0N,135,134^FDTEST^FS"
                 + "\n^XZ");
-        this.txtZplCodeGen.setText("");
-        this.txtPrinterProperties.setText("");
     }
 
     private void loadDriversPrintersUSB() {
-        ZplCustomUtils.getListPrinterByFilter(OptionConnect.USB).forEach(dp -> {
+        ZplCustomUtils.getListPrinterByFilter(OptionConnect.USB_CONNECT).forEach(dp -> {
             this.cbPrinters.addItem(dp.printerName);
         });
     }
@@ -821,23 +782,7 @@ public class Main extends javax.swing.JFrame {
         this.txtPrinterProperties.setText(mapDiscoveredPrinters.get(ipAddress));
     }
 
-    private void waitingDialog(final String infoMessage, final String titleBar) {
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showOptionDialog(this, infoMessage,
-                    titleBar, JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE, null,
-                    new Object[]{}, null);
-        });
-    }
-
-    private static void centreWindow(final Window frame) {
-        final Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-        int x = (int) ((dimension.getWidth() - frame.getWidth()) / 2);
-        int y = (int) ((dimension.getHeight() - frame.getHeight()) / 2);
-        frame.setLocation(x, y);
-    }
-
-    // ############ End private methods ###############
+// ############ End private methods ###############
     /**
      * @param args the command line arguments
      */
@@ -852,16 +797,21 @@ public class Main extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Main.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Main.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Main.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Main.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -874,11 +824,10 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnClearImageContent;
     private javax.swing.JButton btnGenerateCode;
     private javax.swing.JButton btnProcessImage;
     private javax.swing.JButton btnResetInput;
-    private javax.swing.JButton btnSearchIps;
     private javax.swing.JButton btnSearchPrinters;
     private javax.swing.JButton btnSelectFile;
     private javax.swing.JButton btnSendPrinter;
@@ -886,22 +835,21 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbPrinters;
     private javax.swing.JSpinner fontSizeSpinner;
     private javax.swing.JButton jButton1;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -910,15 +858,15 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel lblStatus;
     private javax.swing.JSpinner marginLeftSpinner;
     private javax.swing.JSpinner marginTopSpiner;
-    private javax.swing.JProgressBar pbFindPrinter;
+    private javax.swing.JPanel panelConnction;
     private javax.swing.ButtonGroup rbGroup;
-    private javax.swing.JRadioButton rbOptUsb;
-    private javax.swing.JRadioButton rbOptWifi;
+    private javax.swing.JRadioButton rbSendPrinterUsb;
+    private javax.swing.JRadioButton rbSendPrinterWifi;
+    private javax.swing.ButtonGroup rbgFindPrinters;
     private javax.swing.JSpinner spaceLineSpinner;
     private javax.swing.JTextField txtFilePath;
     private javax.swing.JTextArea txtInputZplCode;
     private javax.swing.JTextField txtIpAddress;
-    private javax.swing.JTextField txtIpRange;
     private javax.swing.JTextField txtPortNro;
     private javax.swing.JTextArea txtPrinterProperties;
     private javax.swing.JTextArea txtZplCodeGen;

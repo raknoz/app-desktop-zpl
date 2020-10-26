@@ -7,9 +7,7 @@ package demo_zpl.utils;
 
 import com.zebra.sdk.comm.ConnectionException;
 import com.zebra.sdk.printer.discovery.DiscoveredPrinterDriver;
-import com.zebra.sdk.printer.discovery.DiscoveredUsbPrinter;
 import com.zebra.sdk.printer.discovery.UsbDiscoverer;
-import com.zebra.sdk.printer.discovery.ZebraPrinterFilter;
 import demo_zpl.enums.OptionConnect;
 import fr.w3blog.zpl.constant.ZebraFont;
 import fr.w3blog.zpl.model.ZebraElement;
@@ -17,8 +15,6 @@ import fr.w3blog.zpl.model.ZebraLabel;
 import fr.w3blog.zpl.model.element.ZebraNativeZpl;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -56,7 +52,7 @@ public class ZplCustomUtils {
     public static List<DiscoveredPrinterDriver> getListPrinterByFilter(final OptionConnect option) {
         final List<DiscoveredPrinterDriver> printerDriverList = new ArrayList<>();
         try {
-            if (option.equals(OptionConnect.USB)) {
+            if (option.equals(OptionConnect.USB_CONNECT)) {
                 for (DiscoveredPrinterDriver printer : UsbDiscoverer.getZebraDriverPrinters()) {
                     printerDriverList.add(printer);
                 }
