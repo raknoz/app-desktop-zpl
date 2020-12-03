@@ -71,8 +71,8 @@ public class SearchPrinterWorker extends SwingWorker<Void, Void> {
             this.jComboBox.setEnabled(Boolean.TRUE);
         }
     }
-
+    
     public List<DiscoveredPrinterDto> getDiscoveredPrinters() {
         return this.discoveredPrinters;
-    }
+    }   
 }
