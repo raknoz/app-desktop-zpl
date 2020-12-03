@@ -5,6 +5,7 @@
  */
 package demo_zpl.gui;
 
+import com.zebra.sdk.util.internal.IPAddressUtil;
 import demo_zpl.dto.DataToPrintDTO;
 import demo_zpl.enums.OptionConnect;
 import demo_zpl.service.workers.ProcessImageWorker;
@@ -15,6 +16,7 @@ import demo_zpl.utils.ZplCustomUtils;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.net.Inet4Address;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.InputMap;
@@ -596,16 +598,17 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_rbSendPrinterWifiActionPerformed
 
     private void btnSendPrinterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendPrinterActionPerformed
-        /*
-        You can use the following regular expression to check if a string is base64 encoded or not:
-        ^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$
-        In base64 encoding, the character set is [A-Z, a-z, 0-9, and + /]. 
-        If the rest length is less than 4, the string is padded with '=' characters.
-        ^([A-Za-z0-9+/]{4})* means the string starts with 0 or more base64 groups.
-        ([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$ 
-        means the string ends in one of three forms: [A-Za-z0-9+/]{4}, [A-Za-z0-9+/]{3}= or [A-Za-z0-9+/]{2}==.
-         */
-
+        
+        if(rbSendPrinterWifi.isSelected() && !IPAddressUtil.ipAddressIsValid(txtIpAddress.getText())) {
+            infoBox("Please, Verify the IP direccion and port number for the printer", "Warning");
+            return;
+        } 
+          
+        if(rbSendPrinterUsb.isSelected() && cbPrinters.getSelectedIndex() < 1) {
+            infoBox("Please, select a USB printer", "Warning");
+            return;
+        } 
+        
         //Falta validacion IP y PORT y Combo de nombre de la printer
         final DataToPrintDTO dataToPrintDTO
                 = new DataToPrintDTO(this.txtIpAddress.getText().trim(),
@@ -722,6 +725,7 @@ public class Main extends javax.swing.JFrame {
         this.connectionSelected = OptionConnect.WIRELESS_CONNECT;
         //Limit characters in some textBox
         this.txtPortNro.setDocument(new JTextFieldLimit(4));
+        this.txtPortNro.setText("6101");
     }
 
     private void configFindPrintersTab() {
@@ -780,6 +784,7 @@ public class Main extends javax.swing.JFrame {
 
     private void displayDataPrinter(final String ipAddress) {
         this.txtPrinterProperties.setText(mapDiscoveredPrinters.get(ipAddress));
+        this.txtPrinterProperties.setCaretPosition(0);
     }
 
 // ############ End private methods ###############
